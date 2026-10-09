@@ -1,0 +1,10 @@
+KH001|Nguyen Hai Nam|001204000123|Ha Noi
+KH002|Hoang Vinh Hai|001204000124|Hai Phong
+KH003|Truong Quang Minh|001204000125|Da Nang
+KH004|Hoang Hong Quan|001204000126|Nghe An
+KH005|Nguyen Van Tuan Anh|001204000127|Ha Tinh
+KH006|Tran Van An|001204000128|Bac Ninh
+KH007|Le Thi Binh|001204000129|Thai Binh
+KH008|Pham Van Cuong|001204000130|Nam Dinh
+KH009|Doan Van Dung|001204000131|Vinh Phuc
+KH010|Bui Thi Em|001204000132|Quang Ninh
