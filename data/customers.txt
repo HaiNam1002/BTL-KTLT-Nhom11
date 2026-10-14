@@ -8,3 +8,4 @@ KH007|Le Thi Binh|001204000129|Thai Binh
 KH008|Pham Van Cuong|001204000130|Nam Dinh
 KH009|Doan Van Dung|001204000131|Vinh Phuc
 KH010|Bui Thi Em|001204000132|Quang Ninh
+KH006|Tran Van An|001204000128|Bac Ninh|Tran Van An|001204000128|Bac Ninh
