@@ -326,7 +326,7 @@ void menuTopUp(Repository<TopUp>& topupRepo, Repository<PaymentTransaction>& pay
                 for (const auto& p : paymentRepo.getAll()) totalPayment += p.getAmount();
                 for (const auto& t : topupRepo.getAll()) totalTopUp += t.getAmount();
 
-                cout << "\n================ BUA CAO DOANH THU NHA MANG ================\n";
+                cout << "\n================ BAO CAO DOANH THU NHA MANG ================\n";
                 cout << "1. Tong doanh thu Thanh toan Hoa don (Tra sau): " << (long long)totalPayment << " VND\n";
                 cout << "2. Tong doanh thu Phieu nap tien (Tra truoc):   " << (long long)totalTopUp << " VND\n";
                 cout << "------------------------------------------------------------\n";
