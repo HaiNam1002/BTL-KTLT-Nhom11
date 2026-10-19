@@ -7,6 +7,7 @@
 #include "include/Customer.h"
 #include "include/PaymentTransaction.h"
 #include "include/TopUp.h"
+#include "include/Subscription.h"
 #include "include/InputHelper.h"
 
 using namespace std;
