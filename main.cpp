@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <string>
 #include <vector>
+#include <limits>
 #include <stdexcept>
 #include "include/Repository.h"
 #include "include/Customer.h"
@@ -12,11 +13,19 @@
 
 using namespace std;
 
-void menuCustomer(Repository<Customer>& repo);
+// --- DỌN BẸN BỘ NHỚ ĐỆM (FIX LỖI 'clearInputBuffer was not declared') ---
+void clearInputBuffer() {
+    cin.clear();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+}
+
+// --- KHAI BÁO PROTOTYPE HÀM (CẬP NHẬT ĐÚNG THAM SỐ TRUYỀN VÀO) ---
+void menuCustomer(Repository<Customer>& repo, Repository<Subscription>& subRepo);
+void menuSubscription(Repository<Subscription>& subRepo, Repository<Customer>& cusRepo);
 void menuPayment(Repository<PaymentTransaction>& repo);
 void menuTopUp(Repository<TopUp>& topupRepo, Repository<PaymentTransaction>& paymentRepo);
 
-
+// --- MENU KHÁCH HÀNG ---
 void printCustomerHeader() {
     cout << "+---------+-----------------------+----------------+---------------------------+\n";
     cout << "| Ma KH   | Ho va Ten             | CCCD           | Dia Chi                   |\n";
@@ -44,7 +53,7 @@ void menuCustomer(Repository<Customer>& repo, Repository<Subscription>& subRepo)
             cout << "\n--- DANH SACH KHACH HANG ---\n";
             printCustomerHeader();
             for (const auto& c : repo.getAll()) c.display();
-            cout << "+---------+-----------------------+----------------+---------------------------+\n";
+            printCustomerFooter();
             cout << "Tong so: " << repo.getAll().size() << " khach hang.\n";
         }
         else if (choice == 2) {
@@ -65,7 +74,7 @@ void menuCustomer(Repository<Customer>& repo, Repository<Subscription>& subRepo)
             if (c) {
                 printCustomerHeader();
                 c->display();
-                cout << "+---------+-----------------------+----------------+---------------------------+\n";
+                printCustomerFooter();
             } else {
                 cout << "[Thong bao] Khong tim thay!\n";
             }
@@ -105,7 +114,7 @@ void menuCustomer(Repository<Customer>& repo, Repository<Subscription>& subRepo)
     }
 }
 
-// --- MENU THUE BAO ---
+// --- MENU THUÊ BAO ---
 void printSubHeader() {
     cout << "+---------+--------------+----------+-------------+---------------+------------+\n";
     cout << "| Ma TB   | So DT        | Ma KH    | Loai Hinh   | So Du (dong)  | Trang Thai |\n";
@@ -189,6 +198,7 @@ void menuSubscription(Repository<Subscription>& subRepo, Repository<Customer>& c
     }
 }
 
+// --- MENU GIAO DỊCH THANH TOÁN ---
 void printPaymentHeader() {
     cout << "+-----------+-------------+-----------------+----------------+--------------+\n";
     cout << "| Ma GD     | Ma Hoa Don  | So Tien (VND)   | Phuong Thuc    | Ngay GD      |\n";
@@ -235,7 +245,7 @@ void menuPayment(Repository<PaymentTransaction>& repo) {
                 string date = InputHelper::getString("Nhap ngay giao dich (dd/mm/yyyy): ");
 
                 PaymentTransaction newP(id, invId, amt, method, date);
-                repo.add(newP); // Hàm add của Repository đã tự động gọi save()
+                repo.add(newP);
                 cout << "=> Them giao dich thanh cong va da luu vao file!\n";
             }
             else if (choice == 3) {
@@ -258,7 +268,7 @@ void menuPayment(Repository<PaymentTransaction>& repo) {
                 
                 cout << "--- Bo trong (Nhan Enter) neu muon giu nguyen gia tri cu ---\n";
                 string input;
-                clearInputBuffer(); // Xóa đệm trước khi dùng getline
+                clearInputBuffer();
                 
                 cout << "Nhap so tien moi: ";
                 getline(cin, input);
@@ -272,7 +282,7 @@ void menuPayment(Repository<PaymentTransaction>& repo) {
                 getline(cin, input);
                 if (!input.empty()) p->setPaymentDate(input);
 
-                repo.saveToFile(); // Ghi đè thay đổi xuống file
+                repo.saveToFile();
                 cout << "=> Cap nhat gia tri giao dich thanh cong!\n";
             }
             else if (choice == 5) {
@@ -289,12 +299,12 @@ void menuPayment(Repository<PaymentTransaction>& repo) {
                 }
             }
         } catch (const exception& e) {
-            // Hứng mọi lỗi ném ra từ lớp Entity hoặc Repository
             cout << "=> [LOI]: " << e.what() << "\n";
         }
     }
 }
 
+// --- MENU NẠP TIỀN & DOANH THU ---
 void printTopUpHeader() {
     cout << "+-----------+-----------------+-----------------+--------------+\n";
     cout << "| Ma Phieu  | So Dien Thoai   | So Tien (VND)   | Ngay Nap     |\n";
@@ -414,6 +424,7 @@ void menuTopUp(Repository<TopUp>& topupRepo, Repository<PaymentTransaction>& pay
     }
 }
 
+// --- HÀM MAIN CHÍNH ---
 int main() {
     Repository<Customer> customerRepo("data/customers.txt");
     customerRepo.loadFromFile();
@@ -421,7 +432,7 @@ int main() {
     Repository<Subscription> subRepo("data/subscriptions.txt");
     subRepo.loadFromFile();
 
-     Repository<PaymentTransaction> paymentRepo("data/payments.txt");
+    Repository<PaymentTransaction> paymentRepo("data/payments.txt");
     paymentRepo.loadFromFile();
 
     Repository<TopUp> topupRepo("data/topups.txt");
