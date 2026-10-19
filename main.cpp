@@ -6,8 +6,7 @@
 #include "include/InputHelper.h"
 #include "include/Repository.h"
 #include "include/Customer.h"
-#include "include/PaymentTransaction.h"
-#include "include/TopUp.h"
+#include "include/Subcription.h"
 #include "include/GoiCuoc.h"
 #include "include/DangKy.h"
 
@@ -223,12 +222,13 @@ int main() {
    while (true) {
         cout << "\n================ HE THONG TELECOM BILLING ================\n";
         cout << "1. Quan ly Khach hang (Nam)\n";
-        cout << "2. Quan ly Goi cuoc (Hai)\n";
-        cout << "3. Quan ly Dang ky goi cuoc (Hai)\n";
+        cout << "2. Quan ly Thue bao (Nam)\n";
+        cout << "3. Quan ly Goi cuoc (Hai)\n";
+        cout << "4. Quan ly Dang ky goi cuoc (Hai)\n";
         cout << "0. Thoat he thong\n";
         cout << "=========================================================\n";
         
-        int choice = InputHelper::getInt("Nhap lua chon cua ban: ", 0, 5);
+        int choice = InputHelper::getInt("Nhap lua chon cua ban: ", 0, 4);
 
         if (choice == 0) break;
 
@@ -237,9 +237,12 @@ int main() {
                 menuCustomer(customerRepo);
                 break;
             case 2:
-                menuQuanLyGoiCuoc(goiCuocRepo, dangKyRepo);
+                menuQuanLyThueBao(thueBaoRepo);
                 break;
             case 3:
+                menuQuanLyGoiCuoc(goiCuocRepo, dangKyRepo);
+                break;
+            case 4:
                 menuQuanLyDangKy(dangKyRepo, goiCuocRepo);
                 break;
         }
