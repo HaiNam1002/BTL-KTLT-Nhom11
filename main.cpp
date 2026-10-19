@@ -415,44 +415,37 @@ void menuTopUp(Repository<TopUp>& topupRepo, Repository<PaymentTransaction>& pay
 }
 
 int main() {
-
     Repository<Customer> customerRepo("data/customers.txt");
     customerRepo.loadFromFile();
-    Repository<PaymentTransaction> paymentRepo("data/payments.txt");
+
+    Repository<Subscription> subRepo("data/subscriptions.txt");
+    subRepo.loadFromFile();
+
+     Repository<PaymentTransaction> paymentRepo("data/payments.txt");
     paymentRepo.loadFromFile();
+
     Repository<TopUp> topupRepo("data/topups.txt");
     topupRepo.loadFromFile();
 
-
     while (true) {
-        cout << "\n================ HE THONG TELECOM BILLING ================\n";
-        cout << "1. Quan ly Khach hang (Nam)\n";
-        cout << "2. Quan ly Thue bao / Sim (Nam)\n";
-        cout << "3. Quan ly Giao dich thanh toan (Tuan Anh)\n";
-        cout << "4. Quan ly Nap tien & Thong ke doanh thu (Tuan Anh)\n";
-        cout << "0. Thoat he thong\n";
-        cout << "=========================================================\n";
-        
-        int choice = InputHelper::getInt("Nhap lua chon cua ban: ", 0, 4);
+        cout << "\n============================================\n";
+        cout << "   HE THONG QUAN LY CUOC & DICH VU VIEN THONG\n";
+        cout << "============================================\n";
+        cout << "1. Quan ly Khach hang (UC 1)\n";
+        cout << "2. Quan ly Thue bao / SIM (UC 2)\n";
+        cout << "3. Quan ly Giao dich thanh toan (UC 3)\n";
+        cout << "4. Quan ly Nap tien & Thong ke doanh thu (UC 4)\n";
+        cout << "0. Thoat chuong trinh\n";
+        cout << "============================================\n";
+        int mainChoice = InputHelper::getInt("Nhap lua chon: ", 0, 4);
 
-        if (choice == 0) break;
-
-        switch (choice) {
-            case 1:
-                menuCustomer(customerRepo);
-                break;
-            case 2:
-                menuSubscription(subscriptionRepo);
-                break;
-            case 3:
-                menuTopUp(topupRepo, paymentRepo);
-                break;
-            case 4:
-                menuPayment(paymentRepo);
-                break;
-        }
+        if (mainChoice == 0) break;
+        if (mainChoice == 1) menuCustomer(customerRepo, subRepo);
+        else if (mainChoice == 2) menuSubscription(subRepo, customerRepo);
+        else if (mainChoice == 3) menuPayment(paymentRepo);
+        else if (mainChoice == 4) menuTopUp(topupRepo, paymentRepo);
     }
 
-    cout << "\nCam on da su dung he thong!\n";
+    cout << "\nXin cam on da su dung chuong trinh!\n";
     return 0;
 }
