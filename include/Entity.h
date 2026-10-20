@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 using namespace std;
+
 class Entity {
 public:
     virtual ~Entity() {}
