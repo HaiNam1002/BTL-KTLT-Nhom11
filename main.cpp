@@ -33,6 +33,11 @@ void printCustomerHeader() {
 }
 
 void printCustomerFooter() {
+
+// --- MENU KHACH HANG ---
+void printCustomerHeader() {
+    cout << "+---------+-----------------------+----------------+---------------------------+\n";
+    cout << "| Ma KH   | Ho va Ten             | CCCD           | Dia Chi                   |\n";
     cout << "+---------+-----------------------+----------------+---------------------------+\n";
 }
 
@@ -54,6 +59,7 @@ void menuCustomer(Repository<Customer>& repo, Repository<Subscription>& subRepo)
             printCustomerHeader();
             for (const auto& c : repo.getAll()) c.display();
             printCustomerFooter();
+            cout << "+---------+-----------------------+----------------+---------------------------+\n";
             cout << "Tong so: " << repo.getAll().size() << " khach hang.\n";
         }
         else if (choice == 2) {
@@ -75,6 +81,7 @@ void menuCustomer(Repository<Customer>& repo, Repository<Subscription>& subRepo)
                 printCustomerHeader();
                 c->display();
                 printCustomerFooter();
+                cout << "+---------+-----------------------+----------------+---------------------------+\n";
             } else {
                 cout << "[Thong bao] Khong tim thay!\n";
             }
@@ -425,6 +432,96 @@ void menuTopUp(Repository<TopUp>& topupRepo, Repository<PaymentTransaction>& pay
 }
 
 // --- HÀM MAIN CHÍNH ---
+            }
+        }
+    }
+}
+
+// --- MENU THUE BAO ---
+void printSubHeader() {
+    cout << "+---------+--------------+----------+-------------+---------------+------------+\n";
+    cout << "| Ma TB   | So DT        | Ma KH    | Loai Hinh   | So Du (dong)  | Trang Thai |\n";
+    cout << "+---------+--------------+----------+-------------+---------------+------------+\n";
+}
+
+void menuSubscription(Repository<Subscription>& subRepo, Repository<Customer>& cusRepo) {
+    while (true) {
+        cout << "\n========== QUAN LY THUE BAO / SIM ==========\n";
+        cout << "1. Xem danh sach thue bao\n";
+        cout << "2. Dang ky thue bao moi\n";
+        cout << "3. Tim kiem thue bao theo So dien thoai\n";
+        cout << "4. Doi trang thai thue bao (Khoa/Mo)\n";
+        cout << "5. Huy thue bao\n";
+        cout << "0. Quay lai Menu chinh\n";
+        cout << "============================================\n";
+        int choice = InputHelper::getInt("Nhap lua chon: ", 0, 5);
+        if (choice == 0) break;
+
+        if (choice == 1) {
+            cout << "\n--- DANH SACH THUE BAO ---\n";
+            printSubHeader();
+            for (const auto& s : subRepo.getAll()) s.display();
+            cout << "+---------+--------------+----------+-------------+---------------+------------+\n";
+            cout << "Tong so: " << subRepo.getAll().size() << " thue bao.\n";
+        }
+        else if (choice == 2) {
+            string id = InputHelper::getString("Nhap ma TB (vi du TB011): ");
+            if (subRepo.findById(id) != nullptr) {
+                cout << "[Loi] Ma thue bao da ton tai!\n";
+                continue;
+            }
+            string phone = InputHelper::getString("Nhap so dien thoai (10 chu so): ");
+            string cusId = InputHelper::getString("Nhap ma KH so huu: ");
+            if (cusRepo.findById(cusId) == nullptr) {
+                cout << "[Loi] Ma khach hang khong ton tai tren he thong!\n";
+                continue;
+            }
+            int typeChoice = InputHelper::getInt("Chon loai (1. TRA_TRUOC, 2. TRA_SAU): ", 1, 2);
+            string subType = (typeChoice == 1) ? "TRA_TRUOC" : "TRA_SAU";
+            double bal = (subType == "TRA_TRUOC") ? 50000.0 : 0.0;
+
+            Subscription newSub(id, phone, cusId, subType, bal, "ACTIVE");
+            if (subRepo.add(newSub)) cout << "=> Kich hoat thue bao thanh cong!\n";
+        }
+        else if (choice == 3) {
+            string phone = InputHelper::getString("Nhap so dien thoai can tim: ");
+            bool found = false;
+            for (const auto& s : subRepo.getAll()) {
+                if (s.getPhoneNumber() == phone) {
+                    printSubHeader();
+                    s.display();
+                    cout << "+---------+--------------+----------+-------------+---------------+------------+\n";
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) cout << "[Thong bao] Khong tim thay so thue bao nay!\n";
+        }
+        else if (choice == 4) {
+            string id = InputHelper::getString("Nhap ma TB can cap nhat: ");
+            Subscription* s = subRepo.findById(id);
+            if (!s) { cout << "[Loi] Khong tim thay!\n"; continue; }
+            cout << "Trang thai hien tai: " << s->getStatus() << "\n";
+            int stChoice = InputHelper::getInt("Chon trang thai moi (1. ACTIVE, 2. BLOCKED, 3. CANCELLED): ", 1, 3);
+            string newSt = (stChoice == 1) ? "ACTIVE" : (stChoice == 2 ? "BLOCKED" : "CANCELLED");
+            s->setStatus(newSt);
+            subRepo.update(*s);
+            cout << "=> Cap nhat trang thai thanh cong!\n";
+        }
+        else if (choice == 5) {
+            string id = InputHelper::getString("Nhap ma TB can huy: ");
+            Subscription* s = subRepo.findById(id);
+            if (!s) { cout << "[Loi] Khong tim thay!\n"; continue; }
+            string confirm = InputHelper::getString("Ban co chac chan muon huy so nay? (y/n): ");
+            if (confirm == "y" || confirm == "Y") {
+                subRepo.remove(id);
+                cout << "=> Da huy thue bao thanh cong!\n";
+            }
+        }
+    }
+}
+
+// --- HAM MAIN DIEU KHIEN CHINH ---
 int main() {
     Repository<Customer> customerRepo("data/customers.txt");
     customerRepo.loadFromFile();
@@ -449,6 +546,11 @@ int main() {
         cout << "0. Thoat chuong trinh\n";
         cout << "============================================\n";
         int mainChoice = InputHelper::getInt("Nhap lua chon: ", 0, 4);
+        cout << "1. Quan ly Khach hang\n";
+        cout << "2. Quan ly Thue bao / SIM\n";
+        cout << "0. Thoat chuong trinh\n";
+        cout << "============================================\n";
+        int mainChoice = InputHelper::getInt("Nhap lua chon: ", 0, 2);
 
         if (mainChoice == 0) break;
         if (mainChoice == 1) menuCustomer(customerRepo, subRepo);
