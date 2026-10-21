@@ -13,19 +13,13 @@
 
 using namespace std;
 
-// --- DỌN BẸN BỘ NHỚ ĐỆM (FIX LỖI 'clearInputBuffer was not declared') ---
-void clearInputBuffer() {
-    cin.clear();
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-}
-
-// --- KHAI BÁO PROTOTYPE HÀM (CẬP NHẬT ĐÚNG THAM SỐ TRUYỀN VÀO) ---
+// --- KHAI BÁO PROTOTYPE HÀM ---
 void menuCustomer(Repository<Customer>& repo, Repository<Subscription>& subRepo);
 void menuSubscription(Repository<Subscription>& subRepo, Repository<Customer>& cusRepo);
 void menuPayment(Repository<PaymentTransaction>& repo);
 void menuTopUp(Repository<TopUp>& topupRepo, Repository<PaymentTransaction>& paymentRepo);
 
-// --- MENU KHÁCH HÀNG ---
+// --- HEADER / FOOTER BẢNG KHÁCH HÀNG ---
 void printCustomerHeader() {
     cout << "+---------+-----------------------+----------------+---------------------------+\n";
     cout << "| Ma KH   | Ho va Ten             | CCCD           | Dia Chi                   |\n";
@@ -33,14 +27,10 @@ void printCustomerHeader() {
 }
 
 void printCustomerFooter() {
-
-// --- MENU KHACH HANG ---
-void printCustomerHeader() {
-    cout << "+---------+-----------------------+----------------+---------------------------+\n";
-    cout << "| Ma KH   | Ho va Ten             | CCCD           | Dia Chi                   |\n";
     cout << "+---------+-----------------------+----------------+---------------------------+\n";
 }
 
+// --- MENU KHÁCH HÀNG ---
 void menuCustomer(Repository<Customer>& repo, Repository<Subscription>& subRepo) {
     while (true) {
         cout << "\n========== QUAN LY KHACH HANG ==========\n";
@@ -54,69 +44,74 @@ void menuCustomer(Repository<Customer>& repo, Repository<Subscription>& subRepo)
         int choice = InputHelper::getInt("Nhap lua chon: ", 0, 5);
         if (choice == 0) break;
 
-        if (choice == 1) {
-            cout << "\n--- DANH SACH KHACH HANG ---\n";
-            printCustomerHeader();
-            for (const auto& c : repo.getAll()) c.display();
-            printCustomerFooter();
-            cout << "+---------+-----------------------+----------------+---------------------------+\n";
-            cout << "Tong so: " << repo.getAll().size() << " khach hang.\n";
-        }
-        else if (choice == 2) {
-            string id = InputHelper::getString("Nhap ma KH (vi du KH011): ");
-            if (repo.findById(id) != nullptr) {
-                cout << "[Loi] Ma khach hang da ton tai!\n";
-                continue;
-            }
-            string name = InputHelper::getString("Nhap ho va ten: ");
-            string idCard = InputHelper::getString("Nhap so CCCD: ");
-            string addr = InputHelper::getString("Nhap dia chi: ");
-            Customer newC(id, name, idCard, addr);
-            if (repo.add(newC)) cout << "=> Them thanh cong!\n";
-        }
-        else if (choice == 3) {
-            string id = InputHelper::getString("Nhap ma KH can tim: ");
-            Customer* c = repo.findById(id);
-            if (c) {
+        try {
+            if (choice == 1) {
+                cout << "\n--- DANH SACH KHACH HANG ---\n";
                 printCustomerHeader();
-                c->display();
+                for (const auto& c : repo.getAll()) c.display();
                 printCustomerFooter();
-                cout << "+---------+-----------------------+----------------+---------------------------+\n";
-            } else {
-                cout << "[Thong bao] Khong tim thay!\n";
+                cout << "Tong so: " << repo.getAll().size() << " khach hang.\n";
             }
-        }
-        else if (choice == 4) {
-            string id = InputHelper::getString("Nhap ma KH can sua: ");
-            Customer* c = repo.findById(id);
-            if (!c) { cout << "[Loi] Khong tim thay!\n"; continue; }
-            string newName = InputHelper::getString("Nhap ten moi: ");
-            string newAddr = InputHelper::getString("Nhap dia chi moi: ");
-            c->setFullName(newName);
-            c->setAddress(newAddr);
-            repo.update(*c);
-            cout << "=> Cap nhat thanh cong!\n";
-        }
-        else if (choice == 5) {
-            string id = InputHelper::getString("Nhap ma KH can xoa: ");
-            Customer* c = repo.findById(id);
-            if (!c) { cout << "[Loi] Khong tim thay!\n"; continue; }
+            else if (choice == 2) {
+                string id = InputHelper::getString("Nhap ma KH (vi du KH011): ");
+                if (repo.findById(id) != nullptr) {
+                    cout << "[Loi] Ma khach hang da ton tai!\n";
+                    continue;
+                }
+                string name = InputHelper::getString("Nhap ho va ten: ");
+                string idCard = InputHelper::getString("Nhap so CCCD: ");
+                string addr = InputHelper::getString("Nhap dia chi: ");
+                Customer newC(id, name, idCard, addr);
+                if (repo.add(newC)) cout << "=> Them thanh cong!\n";
+            }
+            else if (choice == 3) {
+                string id = InputHelper::getString("Nhap ma KH can tim: ");
+                Customer* c = repo.findById(id);
+                if (c) {
+                    printCustomerHeader();
+                    c->display();
+                    printCustomerFooter();
+                } else {
+                    cout << "[Thong bao] Khong tim thay!\n";
+                }
+            }
+            else if (choice == 4) {
+                string id = InputHelper::getString("Nhap ma KH can sua: ");
+                Customer* c = repo.findById(id);
+                if (!c) { cout << "[Loi] Khong tim thay!\n"; continue; }
+                
+                cout << "--- Bo trong (Nhan Enter) neu muon giu nguyen gia tri cu ---\n";
+                string newName = InputHelper::getString("Nhap ten moi (bo trong neu giu nguyen): ");
+                string newAddr = InputHelper::getString("Nhap dia chi moi (bo trong neu giu nguyen): ");
+                
+                if (!newName.empty()) c->setFullName(newName);
+                if (!newAddr.empty()) c->setAddress(newAddr);
+                
+                repo.saveToFile();
+                cout << "=> Cap nhat thanh cong!\n";
+            }
+            else if (choice == 5) {
+                string id = InputHelper::getString("Nhap ma KH can xoa: ");
+                Customer* c = repo.findById(id);
+                if (!c) { cout << "[Loi] Khong tim thay!\n"; continue; }
 
-            // Kiem tra rang buoc khoa ngoai
-            bool hasSub = false;
-            for (const auto& s : subRepo.getAll()) {
-                if (s.getCustomerId() == id) { hasSub = true; break; }
-            }
-            if (hasSub) {
-                cout << "[Tu choi] Khach hang dang so huu thue bao, khong the xoa!\n";
-                continue;
-            }
+                bool hasSub = false;
+                for (const auto& s : subRepo.getAll()) {
+                    if (s.getCustomerId() == id) { hasSub = true; break; }
+                }
+                if (hasSub) {
+                    cout << "[Tu choi] Khach hang dang so huu thue bao, khong the xoa!\n";
+                    continue;
+                }
 
-            string confirm = InputHelper::getString("Xac nhan xoa? (y/n): ");
-            if (confirm == "y" || confirm == "Y") {
-                repo.remove(id);
-                cout << "=> Da xoa thanh cong!\n";
+                string confirm = InputHelper::getString("Xac nhan xoa? (y/n): ");
+                if (confirm == "y" || confirm == "Y") {
+                    repo.remove(id);
+                    cout << "=> Da xoa thanh cong!\n";
+                }
             }
+        } catch (const exception& e) {
+            cout << "=> [LOI]: " << e.what() << "\n";
         }
     }
 }
@@ -125,6 +120,10 @@ void menuCustomer(Repository<Customer>& repo, Repository<Subscription>& subRepo)
 void printSubHeader() {
     cout << "+---------+--------------+----------+-------------+---------------+------------+\n";
     cout << "| Ma TB   | So DT        | Ma KH    | Loai Hinh   | So Du (dong)  | Trang Thai |\n";
+    cout << "+---------+--------------+----------+-------------+---------------+------------+\n";
+}
+
+void printSubFooter() {
     cout << "+---------+--------------+----------+-------------+---------------+------------+\n";
 }
 
@@ -141,66 +140,70 @@ void menuSubscription(Repository<Subscription>& subRepo, Repository<Customer>& c
         int choice = InputHelper::getInt("Nhap lua chon: ", 0, 5);
         if (choice == 0) break;
 
-        if (choice == 1) {
-            cout << "\n--- DANH SACH THUE BAO ---\n";
-            printSubHeader();
-            for (const auto& s : subRepo.getAll()) s.display();
-            cout << "+---------+--------------+----------+-------------+---------------+------------+\n";
-            cout << "Tong so: " << subRepo.getAll().size() << " thue bao.\n";
-        }
-        else if (choice == 2) {
-            string id = InputHelper::getString("Nhap ma TB (vi du TB011): ");
-            if (subRepo.findById(id) != nullptr) {
-                cout << "[Loi] Ma thue bao da ton tai!\n";
-                continue;
+        try {
+            if (choice == 1) {
+                cout << "\n--- DANH SACH THUE BAO ---\n";
+                printSubHeader();
+                for (const auto& s : subRepo.getAll()) s.display();
+                printSubFooter();
+                cout << "Tong so: " << subRepo.getAll().size() << " thue bao.\n";
             }
-            string phone = InputHelper::getString("Nhap so dien thoai (10 chu so): ");
-            string cusId = InputHelper::getString("Nhap ma KH so huu: ");
-            if (cusRepo.findById(cusId) == nullptr) {
-                cout << "[Loi] Ma khach hang khong ton tai tren he thong!\n";
-                continue;
-            }
-            int typeChoice = InputHelper::getInt("Chon loai (1. TRA_TRUOC, 2. TRA_SAU): ", 1, 2);
-            string subType = (typeChoice == 1) ? "TRA_TRUOC" : "TRA_SAU";
-            double bal = (subType == "TRA_TRUOC") ? 50000.0 : 0.0;
+            else if (choice == 2) {
+                string id = InputHelper::getString("Nhap ma TB (vi du TB011): ");
+                if (subRepo.findById(id) != nullptr) {
+                    cout << "[Loi] Ma thue bao da ton tai!\n";
+                    continue;
+                }
+                string phone = InputHelper::getString("Nhap so dien thoai (10 chu so): ");
+                string cusId = InputHelper::getString("Nhap ma KH so huu: ");
+                if (cusRepo.findById(cusId) == nullptr) {
+                    cout << "[Loi] Ma khach hang khong ton tai tren he thong!\n";
+                    continue;
+                }
+                int typeChoice = InputHelper::getInt("Chon loai (1. TRA_TRUOC, 2. TRA_SAU): ", 1, 2);
+                string subType = (typeChoice == 1) ? "TRA_TRUOC" : "TRA_SAU";
+                double bal = (subType == "TRA_TRUOC") ? 50000.0 : 0.0;
 
-            Subscription newSub(id, phone, cusId, subType, bal, "ACTIVE");
-            if (subRepo.add(newSub)) cout << "=> Kich hoat thue bao thanh cong!\n";
-        }
-        else if (choice == 3) {
-            string phone = InputHelper::getString("Nhap so dien thoai can tim: ");
-            bool found = false;
-            for (const auto& s : subRepo.getAll()) {
-                if (s.getPhoneNumber() == phone) {
-                    printSubHeader();
-                    s.display();
-                    cout << "+---------+--------------+----------+-------------+---------------+------------+\n";
-                    found = true;
-                    break;
+                Subscription newSub(id, phone, cusId, subType, bal, "ACTIVE");
+                if (subRepo.add(newSub)) cout << "=> Kich hoat thue bao thanh cong!\n";
+            }
+            else if (choice == 3) {
+                string phone = InputHelper::getString("Nhap so dien thoai can tim: ");
+                bool found = false;
+                for (const auto& s : subRepo.getAll()) {
+                    if (s.getPhoneNumber() == phone) {
+                        printSubHeader();
+                        s.display();
+                        printSubFooter();
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) cout << "[Thong bao] Khong tim thay so thue bao nay!\n";
+            }
+            else if (choice == 4) {
+                string id = InputHelper::getString("Nhap ma TB can cap nhat: ");
+                Subscription* s = subRepo.findById(id);
+                if (!s) { cout << "[Loi] Khong tim thay!\n"; continue; }
+                cout << "Trang thai hien tai: " << s->getStatus() << "\n";
+                int stChoice = InputHelper::getInt("Chon trang thai moi (1. ACTIVE, 2. BLOCKED, 3. CANCELLED): ", 1, 3);
+                string newSt = (stChoice == 1) ? "ACTIVE" : (stChoice == 2 ? "BLOCKED" : "CANCELLED");
+                s->setStatus(newSt);
+                subRepo.saveToFile();
+                cout << "=> Cap nhat trang thai thanh cong!\n";
+            }
+            else if (choice == 5) {
+                string id = InputHelper::getString("Nhap ma TB can huy: ");
+                Subscription* s = subRepo.findById(id);
+                if (!s) { cout << "[Loi] Khong tim thay!\n"; continue; }
+                string confirm = InputHelper::getString("Ban co chac chan muon huy so nay? (y/n): ");
+                if (confirm == "y" || confirm == "Y") {
+                    subRepo.remove(id);
+                    cout << "=> Da huy thue bao thanh cong!\n";
                 }
             }
-            if (!found) cout << "[Thong bao] Khong tim thay so thue bao nay!\n";
-        }
-        else if (choice == 4) {
-            string id = InputHelper::getString("Nhap ma TB can cap nhat: ");
-            Subscription* s = subRepo.findById(id);
-            if (!s) { cout << "[Loi] Khong tim thay!\n"; continue; }
-            cout << "Trang thai hien tai: " << s->getStatus() << "\n";
-            int stChoice = InputHelper::getInt("Chon trang thai moi (1. ACTIVE, 2. BLOCKED, 3. CANCELLED): ", 1, 3);
-            string newSt = (stChoice == 1) ? "ACTIVE" : (stChoice == 2 ? "BLOCKED" : "CANCELLED");
-            s->setStatus(newSt);
-            subRepo.update(*s);
-            cout << "=> Cap nhat trang thai thanh cong!\n";
-        }
-        else if (choice == 5) {
-            string id = InputHelper::getString("Nhap ma TB can huy: ");
-            Subscription* s = subRepo.findById(id);
-            if (!s) { cout << "[Loi] Khong tim thay!\n"; continue; }
-            string confirm = InputHelper::getString("Ban co chac chan muon huy so nay? (y/n): ");
-            if (confirm == "y" || confirm == "Y") {
-                subRepo.remove(id);
-                cout << "=> Da huy thue bao thanh cong!\n";
-            }
+        } catch (const exception& e) {
+            cout << "=> [LOI]: " << e.what() << "\n";
         }
     }
 }
@@ -274,20 +277,14 @@ void menuPayment(Repository<PaymentTransaction>& repo) {
                 }
                 
                 cout << "--- Bo trong (Nhan Enter) neu muon giu nguyen gia tri cu ---\n";
-                string input;
-                clearInputBuffer();
-                
-                cout << "Nhap so tien moi: ";
-                getline(cin, input);
-                if (!input.empty()) p->setAmount(stod(input));
+                string amtStr = InputHelper::getString("Nhap so tien moi (bo trong neu giu nguyen): ");
+                if (!amtStr.empty()) p->setAmount(stod(amtStr));
 
-                cout << "Nhap phuong thuc moi: ";
-                getline(cin, input);
-                if (!input.empty()) p->setPaymentMethod(input);
+                string method = InputHelper::getString("Nhap phuong thuc moi (bo trong neu giu nguyen): ");
+                if (!method.empty()) p->setPaymentMethod(method);
                 
-                cout << "Nhap ngay giao dich moi: ";
-                getline(cin, input);
-                if (!input.empty()) p->setPaymentDate(input);
+                string date = InputHelper::getString("Nhap ngay giao dich moi (bo trong neu giu nguyen): ");
+                if (!date.empty()) p->setPaymentDate(date);
 
                 repo.saveToFile();
                 cout << "=> Cap nhat gia tri giao dich thanh cong!\n";
@@ -380,20 +377,14 @@ void menuTopUp(Repository<TopUp>& topupRepo, Repository<PaymentTransaction>& pay
                 }
                 
                 cout << "--- Bo trong (Nhan Enter) neu muon giu nguyen gia tri cu ---\n";
-                string input;
-                clearInputBuffer(); 
-                
-                cout << "Nhap so dien thoai moi: ";
-                getline(cin, input);
-                if (!input.empty()) t->setPhoneNumber(input);
+                string phone = InputHelper::getString("Nhap so dien thoai moi (bo trong neu giu nguyen): ");
+                if (!phone.empty()) t->setPhoneNumber(phone);
 
-                cout << "Nhap so tien nap moi: ";
-                getline(cin, input);
-                if (!input.empty()) t->setAmount(stod(input));
+                string amtStr = InputHelper::getString("Nhap so tien nap moi (bo trong neu giu nguyen): ");
+                if (!amtStr.empty()) t->setAmount(stod(amtStr));
                 
-                cout << "Nhap ngay nap moi: ";
-                getline(cin, input);
-                if (!input.empty()) t->setTopupDate(input);
+                string date = InputHelper::getString("Nhap ngay nap moi (bo trong neu giu nguyen): ");
+                if (!date.empty()) t->setTopupDate(date);
 
                 topupRepo.saveToFile(); 
                 cout << "=> Cap nhat phieu nap thanh cong!\n";
@@ -431,7 +422,6 @@ void menuTopUp(Repository<TopUp>& topupRepo, Repository<PaymentTransaction>& pay
     }
 }
 
-
 // --- HAM MAIN DIEU KHIEN CHINH ---
 int main() {
     Repository<Customer> customerRepo("data/customers.txt");
@@ -452,8 +442,8 @@ int main() {
         cout << "============================================\n";
         cout << "1. Quan ly Khach hang\n";
         cout << "2. Quan ly Thue bao / SIM\n";
-        cout << "3. Quan ly Giao dich thanh toan (UC 3)\n";
-        cout << "4. Quan ly Nap tien & Thong ke doanh thu (UC 4)\n";
+        cout << "3. Quan ly Giao dich thanh toan\n";
+        cout << "4. Quan ly Nap tien & Thong ke doanh thu\n";
         cout << "0. Thoat chuong trinh\n";
         cout << "============================================\n";
         int mainChoice = InputHelper::getInt("Nhap lua chon: ", 0, 4);

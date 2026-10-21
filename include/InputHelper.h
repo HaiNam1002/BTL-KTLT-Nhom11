@@ -4,11 +4,6 @@
 #include <limits>
 
 using namespace std;
-
-class InputHelper {
-public:
-    // Nhập chuỗi không được để rỗng
-using namespace std;
 class InputHelper {
 public:
     static string getString(const string& prompt) {
