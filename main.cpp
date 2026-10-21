@@ -316,10 +316,10 @@ int main() {
         cout << "\n============================================\n";
         cout << "   HE THONG QUAN LY CUOC & DICH VU VIEN THONG\n";
         cout << "============================================\n";
-        cout << "1. Quan ly Khach hang (UC 1)\n";
-        cout << "2. Quan ly Thue bao / SIM (UC 2)\n";
-        cout << "3. Quan ly Goi cuoc (Hai)\n";
-        cout << "4. Quan ly Dang ky goi cuoc (Hai)\n";
+        cout << "1. Quan ly Khach hang\n";
+        cout << "2. Quan ly Thue bao / SIM\n";
+        cout << "3. Quan ly Goi cuoc\n";
+        cout << "4. Quan ly Dang ky goi cuoc\n";
         cout << "0. Thoat chuong trinh\n";
         cout << "============================================\n";
         int mainChoice = InputHelper::getInt("Nhap lua chon: ", 0, 4);
