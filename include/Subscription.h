@@ -3,6 +3,7 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+
 using namespace std;
 class Subscription : public Entity {
 private:
@@ -55,5 +56,4 @@ public:
         getline(ss, status, '|');
         balance = balStr.empty() ? 0.0 : stod(balStr);
     }
-};
 };
