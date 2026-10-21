@@ -56,3 +56,4 @@ public:
         balance = balStr.empty() ? 0.0 : stod(balStr);
     }
 };
+};
