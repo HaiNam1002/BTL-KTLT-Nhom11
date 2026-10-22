@@ -2,66 +2,69 @@
 #include "Entity.h"
 #include <iostream>
 #include <iomanip>
-#include <sstream>
 #include <string>
+#include <sstream>
+
+using namespace std;
 
 class BillingRecord : public Entity {
 private:
-    std::string transactionId; // Mã giao dịch
-    std::string phoneNumber;   // Số thuê bao
-    std::string serviceType;   // Loại dịch vụ (Cuộc gọi, SMS, Data,...)
-    std::string timestamp;     // Thời điểm phát sinh
-    double usage;              // Dung lượng sử dụng (MB, giây,...)
-    double amount;             // Thành tiền
+    string transactionId; // Mã giao dịch
+    string phoneNumber;   // Số thuê bao
+    string serviceType;   // Loại dịch vụ (Cuộc gọi, SMS, Data,...)
+    string timestamp;     // Thời điểm phát sinh
+    double usage;         // Dung lượng sử dụng (MB, giây,...)
+    double amount;        // Thành tiền
 
 public:
     BillingRecord() : usage(0.0), amount(0.0) {}
 
-    BillingRecord(std::string transId, std::string phone, std::string service, 
-                  std::string time, double use, double amt)
+    // Tối ưu: Dùng tham chiếu hằng (const string&) để tránh copy dữ liệu chuỗi khi khởi tạo
+    BillingRecord(const string& transId, const string& phone, const string& service, 
+                  const string& time, double use, double amt)
         : transactionId(transId), phoneNumber(phone), serviceType(service), 
           timestamp(time), usage(use), amount(amt) {}
 
     // Getters
-    std::string getId() const override { return transactionId; }
-    std::string getPhoneNumber() const { return phoneNumber; }
-    std::string getServiceType() const { return serviceType; }
-    std::string getTimestamp() const { return timestamp; }
+    string getId() const override { return transactionId; }
+    string getPhoneNumber() const { return phoneNumber; }
+    string getServiceType() const { return serviceType; }
+    string getTimestamp() const { return timestamp; }
     double getUsage() const { return usage; }
     double getAmount() const { return amount; }
 
     // Setters
-    void setServiceType(const std::string& service) { serviceType = service; }
+    void setServiceType(const string& service) { serviceType = service; }
     void setAmount(double amt) { amount = amt; }
 
     void display() const override {
-        std::cout << "| " << std::left << std::setw(12) << transactionId 
-                  << "| " << std::setw(13) << phoneNumber 
-                  << "| " << std::setw(15) << serviceType 
-                  << "| " << std::setw(20) << timestamp 
-                  << "| " << std::right << std::setw(10) << std::fixed << std::setprecision(2) << usage 
-                  << " | " << std::setw(12) << amount << " |\n";
+        cout << "| " << left << setw(12) << transactionId 
+             << "| " << setw(13) << phoneNumber 
+             << "| " << setw(15) << serviceType 
+             << "| " << setw(20) << timestamp 
+             << "| " << right << setw(10) << fixed << setprecision(2) << usage 
+             // Ép kiểu amount về long long để tránh lỗi hiển thị khoa học (e) với số tiền lớn
+             << " | " << setw(12) << (long long)amount << " |\n";
     }
 
-    std::string toFileString() const override {
-        std::stringstream ss;
-        ss << transactionId << "|" << phoneNumber << "|" << serviceType << "|"
-           << timestamp << "|" << usage << "|" << amount;
-        return ss.str();
+    string toFileString() const override {
+        // Tối ưu: Thay thế stringstream bằng nối chuỗi trực tiếp để tăng tốc độ ghi file
+        return transactionId + "|" + phoneNumber + "|" + serviceType + "|"
+             + timestamp + "|" + to_string(usage) + "|" + to_string((long long)amount);
     }
 
-    void fromFileString(const std::string& line) override {
-        std::stringstream ss(line);
-        std::string usageStr, amountStr;
+    void fromFileString(const string& line) override {
+        stringstream ss(line);
+        string usageStr, amountStr;
 
-        std::getline(ss, transactionId, '|');
-        std::getline(ss, phoneNumber, '|');
-        std::getline(ss, serviceType, '|');
-        std::getline(ss, timestamp, '|');
-        std::getline(ss, usageStr, '|');
-        std::getline(ss, amountStr, '|');
+        getline(ss, transactionId, '|');
+        getline(ss, phoneNumber, '|');
+        getline(ss, serviceType, '|');
+        getline(ss, timestamp, '|');
+        getline(ss, usageStr, '|');
+        getline(ss, amountStr, '|');
 
-        if (!usageStr.empty()) usage = std::stod(usageStr);
-        if (!amountStr.empty()) amount = std::stod(amountStr);
+        if (!usageStr.empty()) usage = stod(usageStr);
+        if (!amountStr.empty()) amount = stod(amountStr);
     }
 };
