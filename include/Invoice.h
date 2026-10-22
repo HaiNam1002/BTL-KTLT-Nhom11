@@ -3,55 +3,73 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <vector>
 
 class Invoice : public Entity {
 private:
+    std::string id; // Khai báo id tại đây để lưu trữ
     std::string subscriberId;
     std::string month;
-    double totalAmount{0.0}; // Khởi tạo mặc định ngay tại vị trí khai báo
+    double totalAmount;
     std::string paymentStatus;
     std::string date;
 
 public:
-    // Sử dụng default constructor của compiler
-    Invoice() = default;
+    Invoice() : totalAmount(0.0) {}
 
-    Invoice(const std::string& id, const std::string& subId, const std::string& m, 
-            double amount, const std::string& status, const std::string& d): subscriberId(subId), month(m), totalAmount(amount), paymentStatus(status), date(d) {
-        setId(id);
+    Invoice(std::string id, std::string subId, std::string m, double amount, std::string status, std::string d) {
+        this->id = id; // Gán trực tiếp, không dùng setId()
+        this->subscriberId = subId;
+        this->month = m;
+        this->totalAmount = amount;
+        this->paymentStatus = status;
+        this->date = d;
     }
 
-    [[nodiscard]] std::string getPaymentStatus() const { return paymentStatus; }
-    [[nodiscard]] double getTotalAmount() const { return totalAmount; }
+    // --- BẮT BUỘC: Ghi đè hàm getId() từ Entity để Invoice không bị abstract ---
+    std::string getId() const override { 
+        return id; 
+    }
 
-    // Setters: Truyền bằng tham chiếu hằng
+    // --- Getters (Đã xóa [[nodiscard]] để không báo warning ở C++11) ---
+    std::string getPaymentStatus() const { return paymentStatus; }
+    double getTotalAmount() const { return totalAmount; }
+
+    // --- Setters ---
     void setPaymentStatus(const std::string& status) { paymentStatus = status; }
 
-    // Hoàn thiện hàm đọc file sử dụng std::stringstream
-    void fromFileString(const std::string& line) override 
-    {
+    // --- Các hàm bắt buộc từ Entity ---
+    void fromFileString(const std::string& line) override {
         std::stringstream ss(line);
-        std::string tempId, amountStr;
-        
-        std::getline(ss, tempId, ',');
-        setId(tempId);
-        std::getline(ss, subscriberId, ',');
-        std::getline(ss, month, ',');
-        std::getline(ss, amountStr, ',');
-        totalAmount = std::stod(amountStr); // Chuyển chuỗi thành double
-        std::getline(ss, paymentStatus, ',');
-        std::getline(ss, date, ',');
+        std::string token;
+        std::vector<std::string> tokens;
+
+        while (std::getline(ss, token, ',')) {
+            tokens.push_back(token);
+        }
+
+        if (tokens.size() >= 6) {
+            this->id = tokens[0]; // Gán trực tiếp, không dùng setId()
+            this->subscriberId = tokens[1];
+            this->month = tokens[2];
+            try {
+                this->totalAmount = std::stod(tokens[3]);
+            } catch (...) {
+                this->totalAmount = 0.0;
+            }
+            this->paymentStatus = tokens[4];
+            this->date = tokens[5];
+        }
     }
 
-    [[nodiscard]] std::string toFileString() const override 
-    {
-        return getId() + "," + subscriberId + "," + month + "," + 
+    std::string toFileString() const override {
+        return this->id + "," + subscriberId + "," + month + "," + 
                std::to_string(totalAmount) + "," + paymentStatus + "," + date;
     }
 
     void display() const override {
-        std::cout << "ID: " << getId() << " | KH: " << subscriberId << " | Thang: " << month 
+        std::cout << "ID: " << id << " | KH: " << subscriberId << " | Thang: " << month 
                   << " | Tong tien: " << totalAmount << " | Trang thai: " << paymentStatus 
-                  << " | Ngay: " << date << '\n';
+                  << " | Ngay: " << date << "\n";
     }
 };
