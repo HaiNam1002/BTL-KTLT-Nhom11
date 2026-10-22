@@ -1,55 +1,57 @@
 #pragma once
 #include "Entity.h"
+#include <string>
 #include <iostream>
-#include <iomanip>
 #include <sstream>
 
 class Invoice : public Entity {
 private:
-    std::string ruleId;         // Mã quy tắc (RR001...)
-    std::string serviceCode;    // Mã loại dịch vụ (VOICE, SMS, DATA)
-    std::string description;    // Mô tả quy tắc
-    double unitPrice;           // Đơn giá (VND)
-    int blockUnit;              // Đơn vị tính (giây/MB)
+    std::string subscriberId;
+    std::string month;
+    double totalAmount{0.0}; // Khởi tạo mặc định ngay tại vị trí khai báo
+    std::string paymentStatus;
+    std::string date;
 
 public:
-    Invoice() : unitPrice(0.0), blockUnit(1) {}
-    Invoice(std::string id, std::string code, std::string desc, double price, int block)
-        : ruleId(id), serviceCode(code), description(desc), unitPrice(price), blockUnit(block) {}
+    // Sử dụng default constructor của compiler
+    Invoice() = default;
 
-    std::string getId() const override { return ruleId; }
-    std::string getServiceCode() const { return serviceCode; }
-    std::string getDescription() const { return description; }
-    double getUnitPrice() const { return unitPrice; }
-    int getBlockUnit() const { return blockUnit; }
+    Invoice(const std::string& id, const std::string& subId, const std::string& m, 
+            double amount, const std::string& status, const std::string& d): subscriberId(subId), month(m), totalAmount(amount), paymentStatus(status), date(d) {
+        setId(id);
+    }
 
-    void setUnitPrice(double price) { unitPrice = price; }
-    void setDescription(const std::string& desc) { description = desc; }
+    [[nodiscard]] std::string getPaymentStatus() const { return paymentStatus; }
+    [[nodiscard]] double getTotalAmount() const { return totalAmount; }
+
+    // Setters: Truyền bằng tham chiếu hằng
+    void setPaymentStatus(const std::string& status) { paymentStatus = status; }
+
+    // Hoàn thiện hàm đọc file sử dụng std::stringstream
+    void fromFileString(const std::string& line) override 
+    {
+        std::stringstream ss(line);
+        std::string tempId, amountStr;
+        
+        std::getline(ss, tempId, ',');
+        setId(tempId);
+        std::getline(ss, subscriberId, ',');
+        std::getline(ss, month, ',');
+        std::getline(ss, amountStr, ',');
+        totalAmount = std::stod(amountStr); // Chuyển chuỗi thành double
+        std::getline(ss, paymentStatus, ',');
+        std::getline(ss, date, ',');
+    }
+
+    [[nodiscard]] std::string toFileString() const override 
+    {
+        return getId() + "," + subscriberId + "," + month + "," + 
+               std::to_string(totalAmount) + "," + paymentStatus + "," + date;
+    }
 
     void display() const override {
-        std::cout << "| " << std::left << std::setw(8) << ruleId 
-                  << "| " << std::setw(18) << serviceCode 
-                  << "| " << std::setw(26) << description 
-                  << "| " << std::right << std::setw(12) << std::fixed << std::setprecision(1) << unitPrice 
-                  << "| " << std::setw(8) << blockUnit << " |\n";
-    }
-
-    std::string toFileString() const override {
-        std::ostringstream oss;
-        oss << ruleId << "|" << serviceCode << "|" << description << "|" 
-            << std::fixed << std::setprecision(1) << unitPrice << "|" << blockUnit;
-        return oss.str();
-    }
-
-    void fromFileString(const std::string& line) override {
-        std::stringstream ss(line);
-        std::string priceStr, blockStr;
-        std::getline(ss, ruleId, '|');
-        std::getline(ss, serviceCode, '|');
-        std::getline(ss, description, '|');
-        std::getline(ss, priceStr, '|');
-        std::getline(ss, blockStr, '|');
-        unitPrice = priceStr.empty() ? 0.0 : std::stod(priceStr);
-        blockUnit = blockStr.empty() ? 1 : std::stoi(blockStr);
+        std::cout << "ID: " << getId() << " | KH: " << subscriberId << " | Thang: " << month 
+                  << " | Tong tien: " << totalAmount << " | Trang thai: " << paymentStatus 
+                  << " | Ngay: " << date << '\n';
     }
 };
