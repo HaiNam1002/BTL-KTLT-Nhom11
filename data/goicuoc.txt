@@ -1,0 +1,10 @@
+GC01|Goi Cuoc Sinh Vien|50000|30
+GC02|Data Khong Gioi Han|120000|30
+GC03|Goi Cuoc Gia Dinh|250000|90
+GC04|Nghe Goi Vang|90000|30
+GC05|Chuyen Vung Quoc Te|500000|15
+GC06|Data Sieu Toc 5G|150000|30
+GC07|Goi Cuoc Nam Vip|1200000|365
+GC08|Youtube & TikTok Pass|70000|30
+GC09|Game Thu Vo Cuc|100000|30
+GC10|Ngoai Mang Gia Re|80000|30

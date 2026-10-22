@@ -1,0 +1,10 @@
+RR001|VOICE|Goi thoai noi mang|890|6
+RR002|VOICE|Goi thoai ngoai mang|1190|6
+RR003|SMS|Nhan tin noi mang|250|1
+RR004|SMS|Nhan tin ngoai mang|300|1
+RR005|DATA|Cuoc phi Data vuot muc (50KB)|75|50
+RR006|VOICE|Goi quoc te vung 1|3500|60
+RR007|VOICE|Goi quoc te vung 2|4200|60
+RR008|SMS|Nhan tin quoc te|2500|1
+RR009|DATA|Data roaming quoc te (1MB)|10000|1024
+RR010|VOICE|Goi Video Call noi mang|1500|6
