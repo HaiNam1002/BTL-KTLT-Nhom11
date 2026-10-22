@@ -4,7 +4,7 @@
 #include <iomanip>
 #include <sstream>
 
-class RatingRule : public Entity {
+class Invoice : public Entity {
 private:
     std::string ruleId;         // Mã quy tắc (RR001...)
     std::string serviceCode;    // Mã loại dịch vụ (VOICE, SMS, DATA)
@@ -13,8 +13,8 @@ private:
     int blockUnit;              // Đơn vị tính (giây/MB)
 
 public:
-    RatingRule() : unitPrice(0.0), blockUnit(1) {}
-    RatingRule(std::string id, std::string code, std::string desc, double price, int block)
+    Invoice() : unitPrice(0.0), blockUnit(1) {}
+    Invoice(std::string id, std::string code, std::string desc, double price, int block)
         : ruleId(id), serviceCode(code), description(desc), unitPrice(price), blockUnit(block) {}
 
     std::string getId() const override { return ruleId; }
