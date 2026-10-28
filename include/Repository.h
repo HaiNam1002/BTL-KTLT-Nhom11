@@ -3,29 +3,36 @@
 #include <string>
 #include <fstream>
 #include <iostream>
-#include <algorithm>
 
 using namespace std;
-template <typename T>
+
+template <class T>
 class Repository {
 private:
     string filePath;
     vector<T> items;
 
 public:
-    Repository(const string& path) : filePath(path) {}
-
+    Repository(string path) {
+        filePath = path;
+    }
+    // Doc du lieu tu file .txt nap vao vector
     void loadFromFile() {
-        items.clear();
+        items.clear(); // Xoa sach danh sach cu tren RAM
         ifstream file(filePath);
+        
+        // Neu file chua ton tai thi tao file moi roi thoat
         if (!file.is_open()) {
             ofstream newFile(filePath);
             newFile.close();
             return;
         }
+
         string line;
         while (getline(file, line)) {
-            if (line.empty() || line[0] == '#') continue;
+            // Bo qua dong trong hoac dong ghi chu co dau #
+            if (line == "" || line[0] == '#') continue;
+
             T item;
             try {
                 item.fromFileString(line);
@@ -37,45 +44,58 @@ public:
         file.close();
     }
 
-    void saveToFile() const {
-        ofstream file(filePath, ios::trunc);
-        for (const auto& item : items) {
-            file << item.toFileString() << "\n";
+    // Ghi toan bo danh sach tu RAM xuong file .txt
+    void saveToFile() {
+        ofstream file(filePath);
+        for (int i = 0; i < items.size(); i++) {
+            file << items[i].toFileString() << "\n";
         }
         file.close();
     }
 
-    const vector<T>& getAll() const { return items; }
-
-    T* findById(const string& id) {
-        for (auto& item : items) {
-            if (item.getId() == id) return &item;
-        }
-        return nullptr;
+    // Lay danh sach tat ca phan tu
+    vector<T> getAll() {
+        return items;
     }
 
-    bool add(const T& item) {
-        if (findById(item.getId()) != nullptr) return false;
+    // Tim phan tu theo ID, tra ve con tro
+    T* findById(string id) {
+        for (int i = 0; i < items.size(); i++) {
+            if (items[i].getId() == id) {
+                return &items[i]; // Tra ve dia chi phan tu tim thay
+            }
+        }
+        return nullptr; // Khong tim thay
+    }
+
+    // Them phan tu moi
+    bool add(T item) {
+        // Neu ID da ton tai thi khong cho them
+        if (findById(item.getId()) != nullptr) {
+            return false;
+        }
         items.push_back(item);
-        saveToFile();
+        saveToFile(); // Luu ngay xuong file
         return true;
     }
 
-    bool remove(const string& id) {
-        auto it = remove_if(items.begin(), items.end(), 
-            [&id](const T& item) { return item.getId() == id; });
-        if (it != items.end()) {
-            items.erase(it, items.end());
-            saveToFile();
-            return true;
+    // Xoa phan tu theo ID
+    bool remove(string id) {
+        for (int i = 0; i < items.size(); i++) {
+            if (items[i].getId() == id) {
+                items.erase(items.begin() + i); // Xoa phan tu tai vi tri i
+                saveToFile(); // Cap nhat lai file
+                return true;
+            }
         }
         return false;
     }
 
-    bool update(const T& newItem) {
-        for (auto& item : items) {
-            if (item.getId() == newItem.getId()) {
-                item = newItem;
+    // Cap nhat thong tin phan tu
+    bool update(T newItem) {
+        for (int i = 0; i < items.size(); i++) {
+            if (items[i].getId() == newItem.getId()) {
+                items[i] = newItem;
                 saveToFile();
                 return true;
             }
