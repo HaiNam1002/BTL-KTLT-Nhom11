@@ -43,9 +43,7 @@ inline void menuratingrule(Repository<RatingRule>& repo) {
             int block = InputHelper::getInt("Nhap block tinh cuoc (giay/MB): ", 1, 3600);
 
             RatingRule rule(id, code, desc, price, block);
-            if (repo.add(rule)) {
-                std::
-        }
+          
         else if (choice == 3) {
             string id = InputHelper::getString("Nhap ma quy tac can tim: ");
             RatingRule* r = repo.findById(id);
