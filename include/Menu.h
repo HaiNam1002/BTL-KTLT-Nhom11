@@ -6,7 +6,7 @@
 #include "Invoice.h"
 #include "InputHelper.h"
 
-// ==================== 1. QUẢN LÝ BIỂU PHÍ TÍNH CƯỚC ====================
+// 1. QUẢN LÝ BIỂU PHÍ TÍNH CƯỚC
 inline void menuRatingRule(Repository<RatingRule>& repo) {
     while (true) {
         cout << "\n========== QUAN LY BIEU PHI TINH CUOC (RATING) ==========\n";
@@ -89,7 +89,7 @@ inline void menuRatingRule(Repository<RatingRule>& repo) {
     }
 }
 
-// ==================== 2. QUẢN LÝ HÓA ĐƠN CƯỚC (CÓ THỐNG KÊ) ====================
+//  2. QUẢN LÝ HÓA ĐƠN CƯỚC (CÓ THỐNG KÊ) 
 inline void menuInvoice(Repository<Invoice>& repo) {
     while (true) {
         cout << "\n========== QUAN LY HOA DON THANH TOAN (INVOICE) ==========\n";
