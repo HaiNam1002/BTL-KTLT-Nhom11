@@ -9,82 +9,81 @@
 // ==================== 1. QUẢN LÝ BIỂU PHÍ TÍNH CƯỚC ====================
 inline void menuRatingRule(Repository<RatingRule>& repo) {
     while (true) {
-        std::cout << "\n========== QUAN LY BIEU PHI TINH CUOC (RATING) ==========\n";
-        std::cout << "1. Xem danh sach quy tac tinh cuoc\n";
-        std::cout << "2. Them quy tac tinh cuoc moi\n";
-        std::cout << "3. Tim kiem quy tac theo Ma\n";
-        std::cout << "4. Cap nhat don gia quy tac\n";
-        std::cout << "5. Xoa quy tac tinh cuoc\n";
-        std::cout << "0. Quay lai\n";
-        std::cout << "=========================================================\n";
+        cout << "\n========== QUAN LY BIEU PHI TINH CUOC (RATING) ==========\n";
+        cout << "1. Xem danh sach quy tac tinh cuoc\n";
+        cout << "2. Them quy tac tinh cuoc moi\n";
+        cout << "3. Tim kiem quy tac theo Ma\n";
+        cout << "4. Cap nhat don gia quy tac\n";
+        cout << "5. Xoa quy tac tinh cuoc\n";
+        cout << "0. Quay lai\n";
+        cout << "=========================================================\n";
         int choice = InputHelper::getInt("Nhap lua chon: ", 0, 5);
 
         if (choice == 0) break;
 
         if (choice == 1) {
-            std::cout << "\n---------------------------- DANH SACH BIEU PHI TINH CUOC ----------------------------\n";
-            std::cout << "+---------+-------------------+----------------------------+--------------+----------+\n";
-            std::cout << "| Ma QT   | Loai Dich Vu      | Mo Ta Quy Tac              | Don Gia(VND) | Block    |\n";
-            std::cout << "+---------+-------------------+----------------------------+--------------+----------+\n";
+            cout << "\n---------------------------- DANH SACH BIEU PHI TINH CUOC ----------------------------\n";
+            cout << "+---------+-------------------+----------------------------+--------------+----------+\n";
+            cout << "| Ma QT   | Loai Dich Vu      | Mo Ta Quy Tac              | Don Gia(VND) | Block    |\n";
+            cout << "+---------+-------------------+----------------------------+--------------+----------+\n";
             for (const auto& item : repo.getAll()) item.display();
-            std::cout << "+---------+-------------------+----------------------------+--------------+----------+\n";
-            std::cout << "Tong so: " << repo.getAll().size() << " quy tac tinh cuoc.\n";
+            cout << "+---------+-------------------+----------------------------+--------------+----------+\n";
+            cout << "Tong so: " << repo.getAll().size() << " quy tac tinh cuoc.\n";
         }
         else if (choice == 2) {
-            std::cout << "\n--- THEM QUY TAC TINH CUOC MOI ---\n";
-            std::string id = InputHelper::getString("Nhap ma quy tac (vi du RR011): ");
+            cout << "\n--- THEM QUY TAC TINH CUOC MOI ---\n";
+            string id = InputHelper::getString("Nhap ma quy tac (vi du RR011): ");
             if (repo.findById(id) != nullptr) {
                 std::cout << "[Loi] Ma quy tac da ton tai tren he thong!\n";
                 continue;
             }
-            std::string code = InputHelper::getString("Nhap loai dich vu (VOICE/SMS/DATA): ");
-            std::string desc = InputHelper::getString("Nhap mo ta quy tac: ");
+            string code = InputHelper::getString("Nhap loai dich vu (VOICE/SMS/DATA): ");
+            string desc = InputHelper::getString("Nhap mo ta quy tac: ");
             double price = InputHelper::getDouble("Nhap don gia (VND): ", 0.0);
             int block = InputHelper::getInt("Nhap block tinh cuoc (giay/MB): ", 1, 3600);
 
             RatingRule rule(id, code, desc, price, block);
             if (repo.add(rule)) {
-                std::cout << "=> Them quy tac thanh cong va da dong bo vao file!\n";
-            }
+                std::
         }
         else if (choice == 3) {
-            std::string id = InputHelper::getString("Nhap ma quy tac can tim: ");
+            string id = InputHelper::getString("Nhap ma quy tac can tim: ");
             RatingRule* r = repo.findById(id);
             if (r) {
-                std::cout << "\nThong tin tim thay:\n";
-                std::cout << "+---------+-------------------+----------------------------+--------------+----------+\n";
+                cout << "\nThong tin tim thay:\n";
+                cout << "+---------+-------------------+----------------------------+--------------+----------+\n";
                 r->display();
-                std::cout << "+---------+-------------------+----------------------------+--------------+----------+\n";
+                cout << "+---------+-------------------+----------------------------+--------------+----------+\n";
             } else {
                 std::cout << "[Thong bao] Khong tim thay ma quy tac nay!\n";
             }
         }
         else if (choice == 4) {
-            std::string id = InputHelper::getString("Nhap ma quy tac can sua: ");
+            string id = InputHelper::getString("Nhap ma quy tac can sua: ");
             RatingRule* r = repo.findById(id);
             if (!r) {
-                std::cout << "[Loi] Khong tim thay ma quy tac!\n";
+                cout << "[Loi] Khong tim thay ma quy tac!\n";
                 continue;
             }
-            std::cout << "Don gia hien tai: " << (long long)r->getUnitPrice() << " VND\n";
+           cout << "Don gia hien tai: " << (long long)r->getUnitPrice() << " VND\n";
             double newPrice = InputHelper::getDouble("Nhap don gia moi (VND): ", 0.0);
             r->setUnitPrice(newPrice);
             repo.update(*r);
-            std::cout << "=> Cap nhat don gia thanh cong va da luu file!\n";
+            cout << "=> Cap nhat don gia thanh cong va da luu file!\n";
         }
         else if (choice == 5) {
-            std::string id = InputHelper::getString("Nhap ma quy tac can xoa: ");
+            string id = InputHelper::getString("Nhap ma quy tac can xoa: ");
             RatingRule* r = repo.findById(id);
             if (!r) {
                 std::cout << "[Loi] Khong tim thay ma quy tac de xoa!\n";
                 continue;
             }
-            std::string confirm = InputHelper::getString("Xac nhan xoa quy tac nay? (y/n): ");
+            string confirm = InputHelper::getString("Xac nhan xoa quy tac nay? (y/n): ");
             if (confirm == "y" || confirm == "Y") {
                 repo.remove(id);
-                std::cout << "=> Da xoa quy tac va cap nhat file!\n";
+               cout << "=> Da xoa quy tac va cap nhat file!\n";
             } else {
-                std::cout << "=> Da huy thao tac xoa.\n";
+                cout << "=> Da huy thao tac xoa.\n";
             }
         }
     }
@@ -93,66 +92,66 @@ inline void menuRatingRule(Repository<RatingRule>& repo) {
 // ==================== 2. QUẢN LÝ HÓA ĐƠN CƯỚC (CÓ THỐNG KÊ) ====================
 inline void menuInvoice(Repository<Invoice>& repo) {
     while (true) {
-        std::cout << "\n========== QUAN LY HOA DON THANH TOAN (INVOICE) ==========\n";
-        std::cout << "1. Xem danh sach hoa don\n";
-        std::cout << "2. Lap hoa don cuoc moi\n";
-        std::cout << "3. Tim kiem hoa don theo Ma\n";
-        std::cout << "4. Cap nhat trang thai thanh toan\n";
-        std::cout << "5. Thong ke tong doanh thu & cong no\n";
-        std::cout << "6. Xoa / Huy hoa don\n";
-        std::cout << "0. Quay lai\n";
-        std::cout << "=========================================================\n";
+        cout << "\n========== QUAN LY HOA DON THANH TOAN (INVOICE) ==========\n";
+        cout << "1. Xem danh sach hoa don\n";
+        cout << "2. Lap hoa don cuoc moi\n";
+        cout << "3. Tim kiem hoa don theo Ma\n";
+        cout << "4. Cap nhat trang thai thanh toan\n";
+        cout << "5. Thong ke tong doanh thu & cong no\n";
+        cout << "6. Xoa / Huy hoa don\n";
+        cout << "0. Quay lai\n";
+        cout << "=========================================================\n";
         int choice = InputHelper::getInt("Nhap lua chon: ", 0, 6);
 
         if (choice == 0) break;
 
         if (choice == 1) {
-            std::cout << "\n---------------------------- DANH SACH HOA DON CUOC ----------------------------\n";
-            std::cout << "+-----------+-----------+-----------+---------------+-------------+--------------+\n";
-            std::cout << "| Ma HD     | Ma TB     | Chu Ky    | Tong Tien(VND)| Trang Thai  | Ngay Lap     |\n";
-            std::cout << "+-----------+-----------+-----------+---------------+-------------+--------------+\n";
+            cout << "\n---------------------------- DANH SACH HOA DON CUOC ----------------------------\n";
+            cout << "+-----------+-----------+-----------+---------------+-------------+--------------+\n";
+            cout << "| Ma HD     | Ma TB     | Chu Ky    | Tong Tien(VND)| Trang Thai  | Ngay Lap     |\n";
+            cout << "+-----------+-----------+-----------+---------------+-------------+--------------+\n";
             for (const auto& item : repo.getAll()) item.display();
-            std::cout << "+-----------+-----------+-----------+---------------+-------------+--------------+\n";
-            std::cout << "Tong so: " << repo.getAll().size() << " hoa don.\n";
+            cout << "+-----------+-----------+-----------+---------------+-------------+--------------+\n";
+            cout << "Tong so: " << repo.getAll().size() << " hoa don.\n";
         }
         else if (choice == 2) {
-            std::cout << "\n--- LAP HOA DON CUOC MOI ---\n";
-            std::string id = InputHelper::getString("Nhap ma hoa don (vi du INV011): ");
+            cout << "\n--- LAP HOA DON CUOC MOI ---\n";
+            string id = InputHelper::getString("Nhap ma hoa don (vi du INV011): ");
             if (repo.findById(id) != nullptr) {
-                std::cout << "[Loi] Ma hoa don da ton tai tren he thong!\n";
+                cout << "[Loi] Ma hoa don da ton tai tren he thong!\n";
                 continue;
             }
-            std::string sub = InputHelper::getString("Nhap ma thue bao (vi du TB001): ");
-            std::string month = InputHelper::getString("Nhap chu ky cuoc (MM/YYYY): ");
+            string sub = InputHelper::getString("Nhap ma thue bao (vi du TB001): ");
+            string month = InputHelper::getString("Nhap chu ky cuoc (MM/YYYY): ");
             double amount = InputHelper::getDouble("Nhap tong tien cuoc (VND): ", 0.0);
-            std::string date = InputHelper::getString("Nhap ngay lap (DD/MM/YYYY): ");
+            string date = InputHelper::getString("Nhap ngay lap (DD/MM/YYYY): ");
 
             Invoice inv(id, sub, month, amount, "UNPAID", date);
             if (repo.add(inv)) {
-                std::cout << "=> Lap hoa don thanh cong va da dong bo vao file!\n";
+                \cout << "=> Lap hoa don thanh cong va da dong bo vao file!\n";
             }
         }
         else if (choice == 3) {
             std::string id = InputHelper::getString("Nhap ma hoa don can tim: ");
             Invoice* inv = repo.findById(id);
             if (inv) {
-                std::cout << "\nThong tin tim thay:\n";
-                std::cout << "+-----------+-----------+-----------+---------------+-------------+--------------+\n";
+                cout << "\nThong tin tim thay:\n";
+                cout << "+-----------+-----------+-----------+---------------+-------------+--------------+\n";
                 inv->display();
-                std::cout << "+-----------+-----------+-----------+---------------+-------------+--------------+\n";
+                cout << "+-----------+-----------+-----------+---------------+-------------+--------------+\n";
             } else {
-                std::cout << "[Thong bao] Khong tim thay hoa don nay!\n";
+                cout << "[Thong bao] Khong tim thay hoa don nay!\n";
             }
         }
         else if (choice == 4) {
-            std::string id = InputHelper::getString("Nhap ma hoa don can cap nhat: ");
+            string id = InputHelper::getString("Nhap ma hoa don can cap nhat: ");
             Invoice* inv = repo.findById(id);
             if (!inv) {
                 std::cout << "[Loi] Khong tim thay hoa don!\n";
                 continue;
             }
-            std::cout << "Trang thai hien tai: " << inv->getPaymentStatus() << "\n";
-            std::string status = InputHelper::getString("Nhap trang thai moi (PAID/UNPAID): ");
+            cout << "Trang thai hien tai: " << inv->getPaymentStatus() << "\n";
+            string status = InputHelper::getString("Nhap trang thai moi (PAID/UNPAID): ");
             inv->setPaymentStatus(status);
             repo.update(*inv);
             std::cout << "=> Cap nhat trang thai thanh cong!\n";
@@ -173,27 +172,27 @@ inline void menuInvoice(Repository<Invoice>& repo) {
                 }
             }
 
-            std::cout << "\n================ THONG KE TAI CHINH CUOC ================\n";
-            std::cout << "1. Da thanh toan (PAID): " << countPaid << " hoa don - Tong: " << (long long)totalPaid << " VND\n";
-            std::cout << "2. Chua thanh toan (UNPAID): " << countUnpaid << " hoa don - Tong: " << (long long)totalUnpaid << " VND\n";
-            std::cout << "=========================================================\n";
+            cout << "\n================ THONG KE TAI CHINH CUOC ================\n";
+            cout << "1. Da thanh toan (PAID): " << countPaid << " hoa don - Tong: " << (long long)totalPaid << " VND\n";
+            cout << "2. Chua thanh toan (UNPAID): " << countUnpaid << " hoa don - Tong: " << (long long)totalUnpaid << " VND\n";
+            cout << "=========================================================\n";
         }
         else if (choice == 6) {
-            std::string id = InputHelper::getString("Nhap ma hoa don can xoa: ");
+            string id = InputHelper::getString("Nhap ma hoa don can xoa: ");
             Invoice* inv = repo.findById(id);
             if (!inv) {
-                std::cout << "[Loi] Khong tim thay hoa don de xoa!\n";
+                cout << "[Loi] Khong tim thay hoa don de xoa!\n";
                 continue;
             }
             if (inv->getPaymentStatus() == "UNPAID") {
-                std::cout << "[Canh bao] Hoa don nay CHUA THANH TOAN! ";
+                cout << "[Canh bao] Hoa don nay CHUA THANH TOAN! ";
             }
-            std::string confirm = InputHelper::getString("Xac nhan xoa hoa don? (y/n): ");
+            string confirm = InputHelper::getString("Xac nhan xoa hoa don? (y/n): ");
             if (confirm == "y" || confirm == "Y") {
                 repo.remove(id);
-                std::cout << "=> Da xoa hoa don va cap nhat file!\n";
+                cout << "=> Da xoa hoa don va cap nhat file!\n";
             } else {
-                std::cout << "=> Da huy thao tac xoa.\n";
+                cout << "=> Da huy thao tac xoa.\n";
             }
         }
     }
