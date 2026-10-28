@@ -7,7 +7,7 @@
 #include "InputHelper.h"
 
 // 1. Quản lí biểu phí tinh cước
-inline void menuRatingRule(Repository<RatingRule>& repo) {
+inline void menuratingrule(Repository<RatingRule>& repo) {
     while (true) {
         cout << "\n========== QUAN LY BIEU PHI TINH CUOC (RATING) ==========\n";
         cout << "1. Xem danh sach quy tac tinh cuoc\n";
