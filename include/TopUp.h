@@ -2,59 +2,74 @@
 #include "Entity.h"
 #include <iostream>
 #include <string>
-#include <iomanip>
 #include <sstream>
 
 using namespace std;
 
 class TopUp : public Entity {
 private:
-    string topupId;      // Mã phiếu nạp (Khóa chính)
-    string phoneNumber;  // Số điện thoại nạp
-    double amount;       // Mệnh giá nạp
-    string topupDate;    // Ngày nạp
+    string maPhieu;
+    string phoneNumber;
+    double amount;
+    string date;
 
 public:
-    TopUp() : amount(0.0) {}
+    // Constructor mặc định
+    TopUp() {
+        maPhieu = "";
+        phoneNumber = "";
+        amount = 0.0;
+        date = "";
+    }
 
-    // Tối ưu truyền const string& để tránh copy chuỗi
-    TopUp(const string& id, const string& phone, double amt, const string& date)
-        : topupId(id), phoneNumber(phone), amount(amt), topupDate(date) {}
+    // Constructor đầy đủ tham số
+    TopUp(string id, string phone, double amt, string d) {
+        maPhieu = id;
+        phoneNumber = phone;
+        amount = amt;
+        date = d;
+    }
 
     // Getters
-    string getId() const override { return topupId; }
+    string getId() const override { return maPhieu; }
     string getPhoneNumber() const { return phoneNumber; }
     double getAmount() const { return amount; }
-    string getTopupDate() const { return topupDate; }
+    string getDate() const { return date; }
 
-    // Setters (phục vụ thao tác Update)
+    // Setters (Bổ sung đầy đủ để fix lỗi)
+    void setMaPhieu(string id) { maPhieu = id; }
+    void setPhoneNumber(string phone) { phoneNumber = phone; }
     void setAmount(double amt) { if (amt >= 0) amount = amt; }
-    void setPhoneNumber(const string& phone) { phoneNumber = phone; }
-    void setTopupDate(const string& date) { topupDate = date; }
+    void setDate(string d) { date = d; }   // <-- Hàm này sẽ giải quyết dứt điểm lỗi của bạn
 
-    // Hiển thị dạng dòng bảng căn cột
+    // Hiển thị dạng bảng
     void display() const override {
-        cout << "| " << left << setw(10) << topupId 
-             << "| " << setw(15) << phoneNumber 
-             << "| " << setw(16) << (long long)amount 
-             << "| " << setw(15) << topupDate << " |\n";
+        cout << "| " << maPhieu;
+        for (int i = maPhieu.length(); i < 9; i++) cout << " ";
+        cout << " | " << phoneNumber;
+        for (int i = phoneNumber.length(); i < 15; i++) cout << " ";
+        cout << " | " << (long long)amount;
+        string amtStr = to_string((long long)amount);
+        for (int i = amtStr.length(); i < 15; i++) cout << " ";
+        cout << " | " << date;
+        for (int i = date.length(); i < 12; i++) cout << " ";
+        cout << " |\n";
     }
 
-    // Chuyển đối tượng thành chuỗi ghi file text
+    // Tuần tự hóa file
     string toFileString() const override {
-        return topupId + "|" + phoneNumber + "|" + to_string((long long)amount) + "|" + topupDate;
+        return maPhieu + "|" + phoneNumber + "|" + to_string((long long)amount) + "|" + date;
     }
 
-    // Đọc dữ liệu từ file text
+    // Giải tuần tự hóa file
     void fromFileString(const string& line) override {
         stringstream ss(line);
         string amtStr;
-
-        getline(ss, topupId, '|');
+        getline(ss, maPhieu, '|');
         getline(ss, phoneNumber, '|');
         getline(ss, amtStr, '|');
-        getline(ss, topupDate, '|');
-
+        getline(ss, date, '|');
+        
         amount = amtStr.empty() ? 0.0 : stod(amtStr);
     }
 };

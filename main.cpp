@@ -235,87 +235,270 @@ void menuSubscription(Repository<Subscription>& subRepo, Repository<Customer>& c
 
 // ==================== 3. MENU GÓI CƯỚC ====================
 void menuQuanLyGoiCuoc(Repository<GoiCuoc>& repoGC, Repository<DangKy>& repoDK) {
-    while (true) {
-        cout << "\n=== QUAN LY GOI CUOC ===\n";
-        cout << "1. Them goi cuoc moi\n";
-        cout << "2. Hien thi danh sach goi cuoc\n";
-        cout << "3. Xoa goi cuoc\n";
+    while (1) {
+        cout << "\n==========QUAN LY GOI CUOC==========\n";
+        cout << "1. Xem danh sach goi cuoc (Read)\n";
+        cout << "2. Them goi cuoc moi\n";
+        cout << "3. Tim kiem goi cuoc\n";
+        cout << "4. Cap nhat thong tin goi cuoc\n";
+        cout << "5. Xoa goi cuoc\n";
         cout << "0. Quay lai menu chinh\n";
         
-        int chon = InputHelper::getInt("Chon chuc nang: ", 0, 3);
+        int chon = InputHelper::getInt("Chon chuc nang [0-5]: ", 0, 5);
         if (chon == 0) break;
 
         if (chon == 1) {
-            string id = InputHelper::getString("Nhap Ma goi cuoc: ");
-            if (repoGC.findById(id) != nullptr) {
-                cout << "[Loi] Ma goi da ton tai!\n";
+            cout << "\n-------------------- DANH SACH GOI CUOC --------------------\n";
+            cout << "+---------+----------------------+----------------+----------+\n";
+            cout << "| Ma Goi  | Ten Goi Cuoc         | Gia Cuoc (VND) | Thoi Han |\n";
+            cout << "+---------+----------------------+----------------+----------+\n";
+            
+            vector<GoiCuoc> danhSach = repoGC.getAll();
+            if (danhSach.size() == 0) {
+                cout << "|                   Chua co goi cuoc nao trong he thong!                |\n";
+            } else {
+                for (int i = 0; i < danhSach.size(); i++) {
+                    danhSach[i].display();
+                }
+            }
+            cout << "+---------+----------------------+----------------+----------+\n";
+            cout << "Tong so: " << danhSach.size() << " goi cuoc.\n";
+        }
+       
+        else if (chon == 2) {
+            cout << "\n--- THEM GOI CUOC MOI ---\n";
+            string maGoi = InputHelper::getString("Nhap Ma goi cuoc: ");
+            if (repoGC.findById(maGoi) != nullptr) {
+                cout << "[Loi] Ma goi da ton tai trong he thong!\n";
                 continue;
             }
-            string ten = InputHelper::getString("Nhap Ten goi cuoc: ");
-            double gia = stod(InputHelper::getString("Nhap Gia cuoc (VND): "));
-            int han = InputHelper::getInt("Nhap Thoi han (Ngay): ", 1, 3650);
+            string tenGoi = InputHelper::getString("Nhap Ten goi cuoc: ");
+            double giaCuoc = InputHelper::getDouble("Nhap Gia cuoc (VND): ", 0.0);
+            int thoiHan = InputHelper::getInt("Nhap Thoi han (Ngay): ", 1, 3650);
 
-            GoiCuoc gc(id, ten, gia, han);
-            repoGC.add(gc);
-            cout << "Them goi cuoc thanh cong!\n";
+            GoiCuoc goiCuocMoi(maGoi, tenGoi, giaCuoc, thoiHan);
+            if (repoGC.add(goiCuocMoi)) {
+                cout << "=> Them goi cuoc thanh cong va da luu vao file!\n";
+            }
+        }
+    
+        else if (chon == 3) {
+            cout << "\n--- TIM KIEM GOI CUOC ---\n";
+            string tuKhoa = InputHelper::getString("Nhap Ma goi hoac Ten goi can tim: ");
+            
+            cout << "\n---------------- KET QUA TIM KIEM ----------------\n";
+            cout << "+---------+----------------------+----------------+----------+\n";
+            cout << "| Ma Goi  | Ten Goi Cuoc         | Gia Cuoc (VND) | Thoi Han |\n";
+            cout << "+---------+----------------------+----------------+----------+\n";
+            
+            vector<GoiCuoc> danhSach = repoGC.getAll();
+            int demKetQua = 0;
+            
+            for (int i = 0; i < danhSach.size(); i++) {
+                // Kiểm tra nếu từ khóa khớp với Mã gói hoặc nằm bên trong Tên gói
+                if (danhSach[i].getMaGoi() == tuKhoa || danhSach[i].getTenGoi().find(tuKhoa) != string::npos) {
+                    danhSach[i].display();
+                    demKetQua++;
+                }
+            }
+            
+            cout << "+---------+----------------------+----------------+----------+\n";
+            if (demKetQua == 0) {
+                cout << "=> Khong tìm thay goi cuoc nao khop voi tu khoa: \"" << tuKhoa << "\"\n";
+            } else {
+                cout << "=> Tim thay " << demKetQua << " ket qua phu hop.\n";
+            }
+        }
 
-        } else if (chon == 2) {
-            cout << "\n--- DANH SACH GOI CUOC ---\n";
-            for (const auto& gc : repoGC.getAll()) gc.display();
+        else if (chon == 4) {
+            cout << "\n--- CAP NHAT THONG TIN GOI CUOC ---\n";
+            string maGoi = InputHelper::getString("Nhap Ma goi cuoc can sua: ");
+            GoiCuoc* goiCuoc = repoGC.findById(maGoi);
+            
+            if (goiCuoc == nullptr) {
+                cout << "[Loi] Khong tim thay ma goi cuoc nay!\n";
+                continue;
+            }
 
-        } else if (chon == 3) {
-            string id = InputHelper::getString("Nhap Ma goi can xoa: ");
+            cout << "=> Tim thay goi cuoc. Nhap thong tin moi:\n";
+            string tenMoi = InputHelper::getString("Nhap Ten goi cuoc moi: ");
+            double giaMoi = InputHelper::getDouble("Nhap Gia cuoc moi (VND): ", 0.0);
+            int thoiHanMoi = InputHelper::getInt("Nhap Thoi han moi (Ngay): ", 1, 3650);
+
+            goiCuoc->setTenGoi(tenMoi);
+            goiCuoc->setGiaCuoc(giaMoi);
+            goiCuoc->setThoiHan(thoiHanMoi);
+
+            repoGC.saveToFile();
+            cout << "=> Cap nhat thong tin goi cuoc thanh cong va da dong bo file!\n";
+        }
+        else if (chon == 5) {
+            cout << "\n--- XOA GOI CUOC ---\n";
+            string maGoi = InputHelper::getString("Nhap Ma goi can xoa: ");
             bool dangSuDung = false;
-            for (const auto& dk : repoDK.getAll()) {
-                if (dk.getMaGoiCuoc() == id) { dangSuDung = true; break; }
+            
+            vector<DangKy> danhSachDangKy = repoDK.getAll();
+            for (int i = 0; i < danhSachDangKy.size(); i++) {
+                if (danhSachDangKy[i].getMaGoiCuoc() == maGoi) { 
+                    dangSuDung = true; 
+                    break; 
+                }
             }
             
             if (dangSuDung) {
                 cout << "[Loi] Khong the xoa vi co thue bao dang su dung goi nay!\n";
-            } else if (repoGC.remove(id)) {
-                cout << "Xoa goi cuoc thanh cong!\n";
             } else {
-                cout << "[Loi] Khong tim thay ma goi nay!\n";
+                string xacNhan = InputHelper::getString("Ban co chac chan muon xoa goi nay? (y/n): ");
+                if (xacNhan == "y" || xacNhan == "Y") {
+                    if (repoGC.remove(maGoi)) {
+                        cout << "=> Xoa goi cuoc thanh cong va cap nhat file!\n";
+                    } else {
+                        cout << "[Loi] Khong tim thay ma goi nay de xoa!\n";
+                    }
+                } else {
+                    cout << "=> Da huy thao tac xoa.\n";
+                }
             }
         }
     }
 }
 
 // ==================== 4. MENU ĐĂNG KÝ ====================
-void menuQuanLyDangKy(Repository<DangKy>& repoDK, Repository<GoiCuoc>& repoGC) {
-    while (true) {
-        cout << "\n=== QUAN LY DANG KY GOI CUOC ===\n";
-        cout << "1. Dang ky goi cuoc cho thue bao\n";
-        cout << "2. Hien thi lich su dang ky\n";
+
+void menuQuanLyDangKy(Repository<DangKy>& khoDangKy, Repository<GoiCuoc>& khoGoiCuoc) {
+    while (1) {
+        cout << "\n==========QUAN LY DANG KY GOI CUOC==========\n";
+        cout << "1. Xem danh sach dang ky\n";
+        cout << "2. Dang ky goi cuoc moi\n";
+        cout << "3. Tim kiem thong tin dang ky\n";
+        cout << "4. Cap nhat thong tin dang ky\n";
+        cout << "5. Huy / Xoa dang ky\n";
         cout << "0. Quay lai menu chinh\n";
 
-        int chon = InputHelper::getInt("Chon chuc nang: ", 0, 2);
+        int chon = InputHelper::getInt("Chon chuc nang [0-5]: ", 0, 5);
         if (chon == 0) break;
 
+        // CHỨC NĂNG 1: XEM DANH SÁCH (READ)
         if (chon == 1) {
+            cout << "\n----------------- LICH SU DANG KY GOI CUOC -----------------\n";
+            cout << "+---------+----------+---------+--------------+\n";
+            cout << "| Ma DK   | Ma TB    | Ma Goi  | Ngay Dang Ky |\n";
+            cout << "+---------+----------+---------+--------------+\n";
+            
+            vector<DangKy> danhSach = khoDangKy.getAll();
+            if (danhSach.size() == 0) {
+                cout << "|            Chua co thong tin dang ky nao!            |\n";
+            } else {
+                for (int i = 0; i < danhSach.size(); i++) {
+                    danhSach[i].display();
+                }
+            }
+            cout << "+---------+----------+---------+--------------+\n";
+            cout << "Tong so: " << danhSach.size() << " luot dang ky.\n";
+        } 
+        // CHỨC NĂNG 2: ĐĂNG KÝ MỚI (CREATE)
+        else if (chon == 2) {
+            cout << "\n--- DANG KY GOI CUOC MOI ---\n";
             string maDK = InputHelper::getString("Nhap Ma don dang ky: ");
-            if (repoDK.findById(maDK) != nullptr) {
-                cout << "[Loi] Ma don dang ky da ton tai!\n"; continue;
+            if (khoDangKy.findById(maDK) != nullptr) {
+                cout << "[Loi] Ma don dang ky da ton tai trong he thong!\n"; 
+                continue;
             }
             string maTB = InputHelper::getString("Nhap Ma thue bao: ");
             string maGC = InputHelper::getString("Nhap Ma goi cuoc can dang ky: ");
             
-            if (repoGC.findById(maGC) == nullptr) {
-                cout << "[Loi] Ma goi cuoc khong ton tai trong he thong!\n"; continue;
+            if (khoGoiCuoc.findById(maGC) == nullptr) {
+                cout << "[Loi] Ma goi cuoc khong ton tai trong he thong!\n"; 
+                continue;
             }
             string ngayDK = InputHelper::getString("Nhap ngay dang ky (DD/MM/YYYY): ");
 
-            DangKy dk(maDK, maTB, maGC, ngayDK);
-            repoDK.add(dk);
-            cout << "Dang ky goi cuoc thanh cong!\n";
+            DangKy donDangKy(maDK, maTB, maGC, ngayDK);
+            if (khoDangKy.add(donDangKy)) {
+                cout << "=> Dang ky goi cuoc thanh cong va da luu vao file!\n";
+            }
+        } 
+        // CHỨC NĂNG 3: TÌM KIẾM ĐĂNG KÝ (SEARCH) - BỔ SUNG MỚI
+        else if (chon == 3) {
+            cout << "\n--- TIM KIEM DON DANG KY ---\n";
+            string tuKhoa = InputHelper::getString("Nhap Ma DK hoac Ma thue bao can tim: ");
+            
+            cout << "\n---------------- KET QUA TIM KIEM ----------------\n";
+            cout << "+---------+----------+---------+--------------+\n";
+            cout << "| Ma DK   | Ma TB    | Ma Goi  | Ngay Dang Ky |\n";
+            cout << "+---------+----------+---------+--------------+\n";
+            
+            vector<DangKy> danhSach = khoDangKy.getAll();
+            int demKetQua = 0;
+            
+            for (int i = 0; i < danhSach.size(); i++) {
+                // Khớp chính xác hoặc gần đúng theo Mã ĐK hoặc Mã Thuê Bao
+                if (danhSach[i].getMaDangKy() == tuKhoa || danhSach[i].getMaThueBao() == tuKhoa) {
+                    danhSach[i].display();
+                    demKetQua++;
+                }
+            }
+            
+            cout << "+---------+----------+---------+--------------+\n";
+            if (demKetQua == 0) {
+                cout << "=> Khong tim thay don dang ky nao khop voi tu khoa: \"" << tuKhoa << "\"\n";
+            } else {
+                cout << "=> Tim thay " << demKetQua << " ket qua phu hop.\n";
+            }
+        }
+        // CHỨC NĂNG 4: CẬP NHẬT / SỬA (UPDATE) - BỔ SUNG MỚI
+        else if (chon == 4) {
+            cout << "\n--- CAP NHAT THONG TIN DANG KY ---\n";
+            string maDK = InputHelper::getString("Nhap Ma don dang ky can sua: ");
+            DangKy* donDangKy = khoDangKy.findById(maDK);
+            
+            if (donDangKy == nullptr) {
+                cout << "[Loi] Khong tim thay ma don dang ky nay!\n";
+                continue;
+            }
 
-        } else if (chon == 2) {
-            cout << "\n--- LICH SU DANG KY ---\n";
-            for (const auto& dk : repoDK.getAll()) dk.display();
+            cout << "=> Tim thay don dang ky. Nhap thong tin moi:\n";
+            string maTBMoi = InputHelper::getString("Nhap Ma thue bao moi: ");
+            string maGCMoi = InputHelper::getString("Nhap Ma goi cuoc moi: ");
+            
+            if (khoGoiCuoc.findById(maGCMoi) == nullptr) {
+                cout << "[Loi] Ma goi cuoc moi khong ton tai tren he thong! Huy cap nhat.\n";
+                continue;
+            }
+            string ngayDKMoi = InputHelper::getString("Nhap ngay dang ky moi (DD/MM/YYYY): ");
+
+            // Cập nhật thông tin thông qua Setter
+            donDangKy->setMaThueBao(maTBMoi);
+            donDangKy->setMaGoiCuoc(maGCMoi);
+            donDangKy->setNgayDangKy(ngayDKMoi);
+
+            // Đồng bộ lưu xuống file
+            khoDangKy.saveToFile();
+            cout << "=> Cap nhat thong tin dang ky thanh cong va da dong bo file!\n";
+        }
+        // CHỨC NĂNG 5: HỦY / XÓA ĐĂNG KÝ (DELETE)
+        else if (chon == 5) {
+            cout << "\n--- HUY DANG KY GOI CUOC ---\n";
+            string maDK = InputHelper::getString("Nhap Ma don dang ky can huy: ");
+            
+            if (khoDangKy.findById(maDK) == nullptr) {
+                cout << "[Loi] Khong tim thay ma don dang ky nay!\n";
+                continue;
+            }
+
+            string xacNhan = InputHelper::getString("Ban co chac chan muon huy don nay? (y/n): ");
+            if (xacNhan == "y" || xacNhan == "Y") {
+                if (khoDangKy.remove(maDK)) {
+                    cout << "=> Huy dang ky thanh cong va da cap nhat file!\n";
+                } else {
+                    cout << "[Loi] Khong the xoa duoc don dang ky!\n";
+                }
+            } else {
+                cout << "=> Da huy thao tac.\n";
+            }
         }
     }
 }
-
 // ==================== 5. MENU THANH TOÁN ====================
 void printPaymentHeader() {
     cout << "+-----------+-------------+-----------------+----------------+--------------+\n";
@@ -427,67 +610,131 @@ void printTopUpFooter() {
     cout << "+-----------+-----------------+-----------------+--------------+\n";
 }
 
-void menuTopUp(Repository<TopUp>& topupRepo, Repository<PaymentTransaction>& paymentRepo) {
-    while (true) {
+// ==================== 6. MENU NẠP TIỀN (FULL CRUD) ====================
+void menuTopUp(Repository<TopUp>& khoNapTien, Repository<PaymentTransaction>& khoThanhToan) {
+    while (1) {
         cout << "\n========== QUAN LY NAP TIEN ==========\n";
-        cout << "1. Xem danh sach phieu nap\n";
-        cout << "2. Tao phieu nap tien moi\n";
-        cout << "3. Tim kiem phieu nap\n";
-        cout << "4. Xoa phieu nap\n";
+        cout << "1. Xem danh sach phieu nap (Read)\n";
+        cout << "2. Tao phieu nap tien moi (Create)\n";
+        cout << "3. Tim kiem phieu nap (Search)\n";
+        cout << "4. Cap nhat thong tin phieu nap (Update) <-- BO SUNG\n";
+        cout << "5. Xoa phieu nap (Delete)\n";
         cout << "0. Quay lai Menu chinh\n";
         cout << "======================================\n";
         
-        int choice = InputHelper::getInt("Nhap lua chon: ", 0, 4);
-        if (choice == 0) break;
+        int luaChon = InputHelper::getInt("Nhap lua chon [0-5]: ", 0, 5);
+        if (luaChon == 0) break;
 
-        try {
-            if (choice == 1) {
-                cout << "\n--- DANH SACH PHIEU NAP ---\n";
-                printTopUpHeader();
-                for (const auto& item : topupRepo.getAll()) item.display();
-                printTopUpFooter();
-            }
-            else if (choice == 2) {
-                string id = InputHelper::getString("Nhap Ma phieu nap: ");
-                if (topupRepo.findById(id) != nullptr) {
-                    cout << "[Loi] Ma phieu da ton tai!\n";
-                    continue;
+        // CHỨC NĂNG 1: XEM DANH SÁCH (READ)
+        if (luaChon == 1) {
+            cout << "\n----------------------- DANH SACH PHIEU NAP -----------------------\n";
+            cout << "+-----------+-----------------+-----------------+--------------+\n";
+            cout << "| Ma Phieu  | So Dien Thoai   | So Tien (VND)   | Ngay Nap     |\n";
+            cout << "+-----------+-----------------+-----------------+--------------+\n";
+            
+            vector<TopUp> danhSach = khoNapTien.getAll();
+            if (danhSach.size() == 0) {
+                cout << "|                  Chua co phieu nap nao trong he thong!          |\n";
+            } else {
+                for (int i = 0; i < danhSach.size(); i++) {
+                    danhSach[i].display();
                 }
-                string phone = InputHelper::getString("Nhap So dien thoai can nap: ");
-                double amount = InputHelper::getDouble("Nhap So tien nap (VND): ", 0.0);
-                string date = InputHelper::getString("Nhap Ngay nap (DD/MM/YYYY): ");
+            }
+            cout << "+-----------+-----------------+-----------------+--------------+\n";
+            cout << "Tong so: " << danhSach.size() << " phieu nap.\n";
+        }
+        // CHỨC NĂNG 2: TẠO PHIẾU NẠP MỚI (CREATE)
+        else if (luaChon == 2) {
+            cout << "\n--- THEM PHIEU NAP MOI ---\n";
+            string maPhieu = InputHelper::getString("Nhap Ma phieu nap: ");
+            if (khoNapTien.findById(maPhieu) != nullptr) {
+                cout << "[Loi] Ma phieu da ton tai trong he thong!\n";
+                continue;
+            }
+            string soDienThoai = InputHelper::getString("Nhap So dien thoai can nap: ");
+            double soTienNap = InputHelper::getDouble("Nhap So tien nap (VND): ", 0.0);
+            string ngayNap = InputHelper::getString("Nhap Ngay nap (DD/MM/YYYY): ");
 
-                TopUp topup(id, phone, amount, date);
-                if (topupRepo.add(topup)) {
-                    cout << "=> Nap tien thanh cong!\n";
+            TopUp phieuNapMoi(maPhieu, soDienThoai, soTienNap, ngayNap);
+            if (khoNapTien.add(phieuNapMoi)) {
+                cout << "=> Nap tien thanh cong va da luu vao file!\n";
+            }
+        }
+        // CHỨC NĂNG 3: TÌM KIẾM PHIẾU NẠP (SEARCH)
+        else if (luaChon == 3) {
+            cout << "\n--- TIM KIEM PHIEU NAP ---\n";
+            string tuKhoa = InputHelper::getString("Nhap Ma phieu hoac So dien thoai can tim: ");
+            
+            cout << "\n---------------- KET QUA TIM KIEM ----------------\n";
+            cout << "+-----------+-----------------+-----------------+--------------+\n";
+            cout << "| Ma Phieu  | So Dien Thoai   | So Tien (VND)   | Ngay Nap     |\n";
+            cout << "+-----------+-----------------+-----------------+--------------+\n";
+            
+            vector<TopUp> danhSach = khoNapTien.getAll();
+            int demKetQua = 0;
+            
+            for (int i = 0; i < danhSach.size(); i++) {
+                if (danhSach[i].getId() == tuKhoa || danhSach[i].getPhoneNumber() == tuKhoa) {
+                    danhSach[i].display();
+                    demKetQua++;
                 }
             }
-            else if (choice == 3) {
-                string id = InputHelper::getString("Nhap Ma phieu nap can tim: ");
-                TopUp* t = topupRepo.findById(id);
-                if (t) {
-                    printTopUpHeader();
-                    t->display();
-                    printTopUpFooter();
+            
+            cout << "+-----------+-----------------+-----------------+--------------+\n";
+            if (demKetQua == 0) {
+                cout << "=> Khong tim thay phieu nap nao khop voi tu khoa: \"" << tuKhoa << "\"\n";
+            } else {
+                cout << "=> Tim thay " << demKetQua << " ket qua phu hop.\n";
+            }
+        }
+        // CHỨC NĂNG 4: CẬP NHẬT / SỬA (UPDATE) - BỔ SUNG MỚI
+        else if (luaChon == 4) {
+            cout << "\n--- CAP NHAT THONG TIN PHIEU NAP ---\n";
+            string maPhieu = InputHelper::getString("Nhap Ma phieu nap can sua: ");
+            TopUp* phieuNap = khoNapTien.findById(maPhieu);
+            
+            if (phieuNap == nullptr) {
+                cout << "[Loi] Khong tim thay ma phieu nap nay!\n";
+                continue;
+            }
+
+            cout << "=> Tim thay phieu nap. Nhap thong tin moi:\n";
+            string soDienThoaiMoi = InputHelper::getString("Nhap So dien thoai moi: ");
+            double soTienMoi = InputHelper::getDouble("Nhap So tien moi (VND): ", 0.0);
+            string ngayNapMoi = InputHelper::getString("Nhap Ngay nap moi (DD/MM/YYYY): ");
+
+            // Cập nhật thuộc tính thông qua Setter (đảm bảo class TopUp.h có các hàm này)
+            phieuNap->setPhoneNumber(soDienThoaiMoi);
+            phieuNap->setAmount(soTienMoi);
+            phieuNap->setDate(ngayNapMoi);
+
+            // Đồng bộ xuống file text
+            khoNapTien.saveToFile();
+            cout << "=> Cap nhat thong tin phieu nap thanh cong va da dong bo file!\n";
+        }
+        // CHỨC NĂNG 5: XÓA PHIẾU NẠP (DELETE)
+        else if (luaChon == 5) {
+            cout << "\n--- XOA PHIEU NAP ---\n";
+            string maPhieu = InputHelper::getString("Nhap Ma phieu nap can xoa: ");
+            
+            if (khoNapTien.findById(maPhieu) == nullptr) {
+                cout << "[Loi] Khong tim thay phieu nap de xoa!\n";
+                continue;
+            }
+
+            string xacNhan = InputHelper::getString("Ban co chac chan muon xoa phieu nay? (y/n): ");
+            if (xacNhan == "y" || xacNhan == "Y") {
+                if (khoNapTien.remove(maPhieu)) {
+                    cout << "=> Da xoa phieu nap thanh cong va cap nhat file!\n";
                 } else {
-                    cout << "[Thong bao] Khong tim thay phieu nap!\n";
+                    cout << "[Loi] Khong the xoa phieu nap!\n";
                 }
+            } else {
+                cout << "=> Da huy thao tac xoa.\n";
             }
-            else if (choice == 4) {
-                string id = InputHelper::getString("Nhap Ma phieu nap can xoa: ");
-                if (topupRepo.remove(id)) {
-                    cout << "=> Da xoa phieu nap thanh cong!\n";
-                } else {
-                    cout << "[Loi] Khong tim thay phieu nap de xoa!\n";
-                }
-            }
-        } catch (const exception& e) {
-            cout << "=> [LOI]: " << e.what() << "\n";
         }
     }
 }
-
-
 // ==================== 7. QUẢN LÝ BIỂU PHÍ TÍNH CƯỚC ====================
 void menuRatingRule(Repository<RatingRule>& repo) {
     while (true) {
