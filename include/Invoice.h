@@ -4,15 +4,15 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
-
+using namespace std;
 class Invoice : public Entity {
 private:
-    std::string id; // Khai báo id tại đây để lưu trữ
-    std::string subscriberId;
-    std::string month;
+    string id; // Khai báo id tại đây để lưu trữ
+    string subscriberId;
+    string month;
     double totalAmount;
-    std::string paymentStatus;
-    std::string date;
+    string paymentStatus;
+    string date;
 
 public:
     Invoice() : totalAmount(0.0) {}
@@ -40,9 +40,9 @@ public:
 
     // --- Các hàm bắt buộc từ Entity ---
     void fromFileString(const std::string& line) override {
-        std::stringstream ss(line);
-        std::string token;
-        std::vector<std::string> tokens;
+        stringstream ss(line);
+        string token;
+        vector<std::string> tokens;
 
         while (std::getline(ss, token, ',')) {
             tokens.push_back(token);
@@ -62,13 +62,13 @@ public:
         }
     }
 
-    std::string toFileString() const override {
+    string toFileString() const override {
         return this->id + "," + subscriberId + "," + month + "," + 
                std::to_string(totalAmount) + "," + paymentStatus + "," + date;
     }
 
     void display() const override {
-        std::cout << "ID: " << id << " | KH: " << subscriberId << " | Thang: " << month 
+       cout << "ID: " << id << " | KH: " << subscriberId << " | Thang: " << month 
                   << " | Tong tien: " << totalAmount << " | Trang thai: " << paymentStatus 
                   << " | Ngay: " << date << "\n";
     }

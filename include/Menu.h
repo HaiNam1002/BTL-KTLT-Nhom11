@@ -6,8 +6,8 @@
 #include "Invoice.h"
 #include "InputHelper.h"
 
-// ==================== 1. QUẢN LÝ BIỂU PHÍ TÍNH CƯỚC ====================
-inline void menuRatingRule(Repository<RatingRule>& repo) {
+// 1. Quản lí biểu phí tinh cước
+inline void menuratingrule(Repository<RatingRule>& repo) {
     while (true) {
         cout << "\n========== QUAN LY BIEU PHI TINH CUOC (RATING) ==========\n";
         cout << "1. Xem danh sach quy tac tinh cuoc\n";
@@ -43,9 +43,7 @@ inline void menuRatingRule(Repository<RatingRule>& repo) {
             int block = InputHelper::getInt("Nhap block tinh cuoc (giay/MB): ", 1, 3600);
 
             RatingRule rule(id, code, desc, price, block);
-            if (repo.add(rule)) {
-                std::
-        }
+          
         else if (choice == 3) {
             string id = InputHelper::getString("Nhap ma quy tac can tim: ");
             RatingRule* r = repo.findById(id);
@@ -89,7 +87,7 @@ inline void menuRatingRule(Repository<RatingRule>& repo) {
     }
 }
 
-// ==================== 2. QUẢN LÝ HÓA ĐƠN CƯỚC (CÓ THỐNG KÊ) ====================
+//  2. Quản lí hóa đơn
 inline void menuInvoice(Repository<Invoice>& repo) {
     while (true) {
         cout << "\n========== QUAN LY HOA DON THANH TOAN (INVOICE) ==========\n";
