@@ -255,7 +255,7 @@ void menuQuanLyGoiCuoc(Repository<GoiCuoc>& repoGC, Repository<DangKy>& repoDK) 
             
             vector<GoiCuoc> danhSach = repoGC.getAll();
             if (danhSach.size() == 0) {
-                cout << "|                   Chua co goi cuoc nao trong he thong!                |\n";
+                cout << "|                  Chua co goi cuoc nao trong he thong!                  |\n";
             } else {
                 for (int i = 0; i < danhSach.size(); i++) {
                     danhSach[i].display();
@@ -304,7 +304,7 @@ void menuQuanLyGoiCuoc(Repository<GoiCuoc>& repoGC, Repository<DangKy>& repoDK) 
             
             cout << "+---------+----------------------+----------------+----------+\n";
             if (demKetQua == 0) {
-                cout << "=> Khong tìm thay goi cuoc nao khop voi tu khoa: \"" << tuKhoa << "\"\n";
+                cout << "=> Khong tim thay goi cuoc nao khop voi tu khoa: \"" << tuKhoa << "\"\n";
             } else {
                 cout << "=> Tim thay " << demKetQua << " ket qua phu hop.\n";
             }
@@ -445,7 +445,7 @@ void menuQuanLyDangKy(Repository<DangKy>& khoDangKy, Repository<GoiCuoc>& khoGoi
             } else {
                 cout << "=> Tim thay " << demKetQua << " ket qua phu hop.\n";
             }
-        }
+        } 
         // CHỨC NĂNG 4: CẬP NHẬT / SỬA (UPDATE) - BỔ SUNG MỚI
         else if (chon == 4) {
             cout << "\n--- CAP NHAT THONG TIN DANG KY ---\n";
@@ -475,7 +475,7 @@ void menuQuanLyDangKy(Repository<DangKy>& khoDangKy, Repository<GoiCuoc>& khoGoi
             // Đồng bộ lưu xuống file
             khoDangKy.saveToFile();
             cout << "=> Cap nhat thong tin dang ky thanh cong va da dong bo file!\n";
-        }
+        } 
         // CHỨC NĂNG 5: HỦY / XÓA ĐĂNG KÝ (DELETE)
         else if (chon == 5) {
             cout << "\n--- HUY DANG KY GOI CUOC ---\n";
@@ -499,6 +499,7 @@ void menuQuanLyDangKy(Repository<DangKy>& khoDangKy, Repository<GoiCuoc>& khoGoi
         }
     }
 }
+
 // ==================== 5. MENU THANH TOÁN ====================
 void printPaymentHeader() {
     cout << "+-----------+-------------+-----------------+----------------+--------------+\n";
@@ -599,8 +600,7 @@ void menuPayment(Repository<PaymentTransaction>& repo) {
     }
 }
 
-
-// ==================== 6. MENU NẠP TIỀN ====================
+// ==================== 6. MENU NẠP TIỀN (FULL CRUD) ====================
 void printTopUpHeader() {
     cout << "+-----------+-----------------+-----------------+--------------+\n";
     cout << "| Ma Phieu  | So Dien Thoai   | So Tien (VND)   | Ngay Nap     |\n";
@@ -610,14 +610,13 @@ void printTopUpFooter() {
     cout << "+-----------+-----------------+-----------------+--------------+\n";
 }
 
-// ==================== 6. MENU NẠP TIỀN (FULL CRUD) ====================
 void menuTopUp(Repository<TopUp>& khoNapTien, Repository<PaymentTransaction>& khoThanhToan) {
     while (1) {
         cout << "\n========== QUAN LY NAP TIEN ==========\n";
         cout << "1. Xem danh sach phieu nap (Read)\n";
         cout << "2. Tao phieu nap tien moi (Create)\n";
         cout << "3. Tim kiem phieu nap (Search)\n";
-        cout << "4. Cap nhat thong tin phieu nap (Update) <-- BO SUNG\n";
+        cout << "4. Cap nhat thong tin phieu nap (Update)\n";
         cout << "5. Xoa phieu nap (Delete)\n";
         cout << "0. Quay lai Menu chinh\n";
         cout << "======================================\n";
@@ -687,7 +686,7 @@ void menuTopUp(Repository<TopUp>& khoNapTien, Repository<PaymentTransaction>& kh
                 cout << "=> Tim thay " << demKetQua << " ket qua phu hop.\n";
             }
         }
-        // CHỨC NĂNG 4: CẬP NHẬT / SỬA (UPDATE) - BỔ SUNG MỚI
+        // CHỨC NĂNG 4: CẬP NHẬT / SỬA (UPDATE)
         else if (luaChon == 4) {
             cout << "\n--- CAP NHAT THONG TIN PHIEU NAP ---\n";
             string maPhieu = InputHelper::getString("Nhap Ma phieu nap can sua: ");
@@ -703,7 +702,7 @@ void menuTopUp(Repository<TopUp>& khoNapTien, Repository<PaymentTransaction>& kh
             double soTienMoi = InputHelper::getDouble("Nhap So tien moi (VND): ", 0.0);
             string ngayNapMoi = InputHelper::getString("Nhap Ngay nap moi (DD/MM/YYYY): ");
 
-            // Cập nhật thuộc tính thông qua Setter (đảm bảo class TopUp.h có các hàm này)
+            // Cập nhật thuộc tính thông qua Setter
             phieuNap->setPhoneNumber(soDienThoaiMoi);
             phieuNap->setAmount(soTienMoi);
             phieuNap->setDate(ngayNapMoi);
@@ -735,6 +734,7 @@ void menuTopUp(Repository<TopUp>& khoNapTien, Repository<PaymentTransaction>& kh
         }
     }
 }
+
 // ==================== 7. QUẢN LÝ BIỂU PHÍ TÍNH CƯỚC ====================
 void menuRatingRule(Repository<RatingRule>& repo) {
     while (true) {
@@ -815,7 +815,7 @@ void menuRatingRule(Repository<RatingRule>& repo) {
                     repo.remove(id);
                     cout << "=> Da xoa quy tac va cap nhat file!\n";
                 } else {
-                    cout << "=> Da huy thao thao tac xoa.\n";
+                    cout << "=> Da huy thao tac xoa.\n";
                 }
             }
         } catch (const exception& e) {
@@ -938,7 +938,6 @@ void menuInvoice(Repository<Invoice>& repo) {
     }
 }
 
-
 // ==================== 9. QUẢN LÝ BẢN GHI CƯỚC ====================
 void menuBillingRecord(Repository<BillingRecord>& repo) {
     while (true) {
@@ -1027,7 +1026,6 @@ void menuBillingRecord(Repository<BillingRecord>& repo) {
         }
     }
 }
-
 
 // ==================== 10. QUẢN LÝ LỊCH SỬ TIÊU DÙNG ====================
 void menuBillingHistory(Repository<BillingHistory>& repo) {
@@ -1120,7 +1118,6 @@ void menuBillingHistory(Repository<BillingHistory>& repo) {
         }
     }
 }
-
 
 // =========================================================================
 // HÀM MAIN ĐIỀU KHIỂN CHÍNH
